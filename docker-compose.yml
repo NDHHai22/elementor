@@ -1,0 +1,48 @@
+services:
+  db:
+    image: mysql:8.3
+    container_name: wordpress_db
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: your_mysql_root_password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: your_wordpress_password
+    networks:
+      - wordpress-network
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:php8.3-apache
+    container_name: wordpress_app
+    ports:
+      - "9090:80"
+    restart: always
+    volumes:
+      # developing plugin / theme
+      - ./elementor/build:/var/www/html/wp-content/plugins/elementor
+      - ./angie:/var/www/html/wp-content/plugins/angie
+      # Custom PHP configuration - use uploads.ini for PHP-FPM
+      - ./custom-php.ini:/usr/local/etc/php/conf.d/uploads.ini
+      # Custom WordPress debug configuration
+      - ./wp-debug-config.php:/var/www/html/wp-content/mu-plugins/wp-debug-config.php
+
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: your_wordpress_password
+      WORDPRESS_DB_NAME: wordpress
+      # Enable WordPress debugging (WP_DEBUG constant)
+      WORDPRESS_DEBUG: 1
+    networks:
+      - wordpress-network
+
+volumes:
+  db_data:
+
+networks:
+  wordpress-network:
+    driver: bridge

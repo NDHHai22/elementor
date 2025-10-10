@@ -12,10 +12,17 @@ services:
       MYSQL_PASSWORD: your_wordpress_password
     networks:
       - wordpress-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pyour_mysql_root_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   wordpress:
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     image: wordpress:php8.3-apache
     container_name: wordpress_app
     ports:

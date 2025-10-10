@@ -10,6 +10,8 @@ use Angie\Classes\Module_Base;
 use Angie\Modules\ConsentManager\Module as ConsentManager;
 use Angie\Plugin;
 use Angie\Modules\ElementorCore\Components\Kit_Provider;
+use Angie\Modules\ElementorCore\Components\Widget_Manager;
+use Angie\Modules\ElementorCore\Components\Html_To_Elementor_Converter;
 use Angie\Includes\Utils;
 /**
  * Module `Elementor Editor`
@@ -28,6 +30,20 @@ class Module extends Module_Base {
 	 * @var \Angie\Modules\ElementorCore\Components\Kit_Provider
 	 */
 	public $kit_provider;
+
+	/**
+	 * Widget Manager controller
+	 *
+	 * @var \Angie\Modules\ElementorCore\Components\Widget_Manager
+	 */
+	public $widget_manager;
+
+	/**
+	 * HTML to Elementor Converter
+	 *
+	 * @var \Angie\Modules\ElementorCore\Components\Html_To_Elementor_Converter
+	 */
+	public $html_converter;
 
 	public function get_name(): string {
 		return 'elementor-core';
@@ -51,9 +67,29 @@ class Module extends Module_Base {
 	 */
 	private function init_rest_controllers() {
 		$this->kit_provider = new Kit_Provider();
+		$this->widget_manager = new Widget_Manager();
+		$this->html_converter = new Html_To_Elementor_Converter();
 	}
 
 	public function enqueue_scripts() {
+		// Enqueue HTML to Elementor converter script
+		wp_enqueue_script(
+			'angie-html-to-elementor',
+			ANGIE_URL . 'modules/elementor-core/assets/js/html-to-elementor-converter.js',
+			[ 'jquery' ],
+			ANGIE_VERSION,
+			true
+		);
+
+		// Enqueue Elementor integration script (button, shortcuts, etc.)
+		wp_enqueue_script(
+			'angie-elementor-integration',
+			ANGIE_URL . 'modules/elementor-core/assets/js/elementor-integration.js',
+			[ 'jquery', 'elementor-editor', 'angie-html-to-elementor' ],
+			ANGIE_VERSION,
+			true
+		);
+
 		/**
 		 * @var \Angie\Modules\AngieApp\Module
 		 */

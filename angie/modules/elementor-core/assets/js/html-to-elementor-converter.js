@@ -446,6 +446,110 @@
         }
 
         /**
+         * Get target container for inserting elements
+         * Similar to Elementor's getContainerForNewElement()
+         * Returns the selected container or document container
+         */
+        getTargetContainer() {
+            // Default to document container
+            const defaultContainer = {
+                container: elementor.getPreviewContainer(),
+                options: {}
+            };
+
+            // Try to get selected elements
+            try {
+                // Get selection from panel
+                const panel = elementor.getPanelView();
+                let selectedElement = null;
+
+                // Check if we're in editor panel with a selected element
+                if ($e.routes.isPartOf('panel/editor')) {
+                    const currentPageView = panel.getCurrentPageView();
+                    if (currentPageView && currentPageView.getOption) {
+                        selectedElement = currentPageView.getOption('editedElementView');
+                    }
+                }
+
+                // If no element from panel, try context menu
+                if (!selectedElement && elementor.channels && elementor.channels.editor) {
+                    selectedElement = elementor.channels.editor.request('contextMenu:targetView');
+                }
+
+                // No selected element, return document
+                if (!selectedElement) {
+                    console.log('📄 No selection, inserting at document level');
+                    return defaultContainer;
+                }
+
+                const selectedContainer = selectedElement.getContainer();
+                const elType = selectedContainer.model.get('elType');
+
+                console.log('🎯 Selected element:', {
+                    type: elType,
+                    id: selectedContainer.id,
+                    label: selectedContainer.model.get('widgetType') || elType
+                });
+
+                // Handle different element types
+                switch (elType) {
+                    case 'widget':
+                        // Insert after the selected widget in its parent
+                        const parent = selectedContainer.parent;
+                        const index = selectedElement._index ?? -1;
+                        
+                        if (parent && index > -1) {
+                            console.log(`  → Inserting after widget at index ${index}`);
+                            return {
+                                container: parent,
+                                options: { at: index + 1 }
+                            };
+                        }
+                        break;
+
+                    case 'section':
+                        // Insert into first column of section
+                        const firstColumn = selectedContainer.children?.[0];
+                        if (firstColumn) {
+                            console.log('  → Inserting into section\'s first column');
+                            return {
+                                container: firstColumn,
+                                options: {}
+                            };
+                        }
+                        break;
+
+                    case 'column':
+                        // Insert into the selected column
+                        console.log('  → Inserting into selected column');
+                        return {
+                            container: selectedContainer,
+                            options: {}
+                        };
+
+                    case 'container':
+                        // For container elements, insert inside
+                        console.log('  → Inserting into container');
+                        return {
+                            container: selectedContainer,
+                            options: {}
+                        };
+
+                    default:
+                        console.log('  → Unknown type, using element as container');
+                        return {
+                            container: selectedContainer,
+                            options: {}
+                        };
+                }
+            } catch (err) {
+                console.warn('Failed to get selected element, using document:', err);
+            }
+
+            return defaultContainer;
+        }
+
+        /**
          * Convert HTML và copy JSON to clipboard
          */
         async convertAndCopy(html) {
@@ -646,11 +750,16 @@
                 }
 
                 try {
+                    // Get target container (selected element or document)
+                    const targetInfo = this.getTargetContainer();
+                    
+                    console.log('🎯 Inserting into:', targetInfo);
+
                     currentElements.forEach(element => {
                         $e.run('document/elements/create', {
                             model: element,
-                            container: elementor.getPreviewContainer(),
-                            options: {}
+                            container: targetInfo.container,
+                            options: targetInfo.options || {}
                         });
                     });
 

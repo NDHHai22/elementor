@@ -39,12 +39,12 @@ jQuery(window).on('elementor:init', function() {
                     jQuery('#angie-converter-button').on('click', function(e) {
                         e.preventDefault();
                         
-                        // Show converter modal
-                        if (typeof window.showAngieConverter === 'function') {
-                            window.showAngieConverter();
+                        // Show AI converter modal
+                        if (typeof window.showAngieAIConverter === 'function') {
+                            window.showAngieAIConverter();
                         } else {
-                            console.error('Angie Converter not loaded');
-                            alert('Angie HTML Converter is not loaded. Please refresh the page.');
+                            console.error('Angie AI Converter not loaded');
+                            alert('Angie AI Converter is not loaded. Please refresh the page.');
                         }
                     });
 
@@ -54,9 +54,18 @@ jQuery(window).on('elementor:init', function() {
         });
 
         // Also add to top bar (alternative location)
+        // Try multiple times to ensure button appears
         setTimeout(function() {
             addToTopBar();
-        }, 1500);
+        }, 1000);
+        
+        setTimeout(function() {
+            addToTopBar();
+        }, 2000);
+        
+        setTimeout(function() {
+            addToTopBar();
+        }, 3000);
     });
 
     /**
@@ -80,8 +89,9 @@ jQuery(window).on('elementor:init', function() {
                         border-radius: 3px;
                         margin-left: 8px;
                         transition: all 0.3s;
+                        box-shadow: 0 2px 5px rgba(146, 0, 59, 0.3);
                      "
-                     title="Angie HTML to Elementor Converter">
+                     title="Angie AI HTML to Elementor Converter (Ctrl+Shift+H)">
                     <i class="eicon-code" style="font-size: 18px;"></i>
                 </div>
             `;
@@ -91,22 +101,35 @@ jQuery(window).on('elementor:init', function() {
             // Hover effect
             jQuery('#angie-top-bar-button').hover(
                 function() {
-                    jQuery(this).css('background', '#D5001C');
+                    jQuery(this).css({
+                        'background': '#D5001C',
+                        'box-shadow': '0 4px 8px rgba(213, 0, 28, 0.4)'
+                    });
                 },
                 function() {
-                    jQuery(this).css('background', '#92003B');
+                    jQuery(this).css({
+                        'background': '#92003B',
+                        'box-shadow': '0 2px 5px rgba(146, 0, 59, 0.3)'
+                    });
                 }
             );
 
             // Click handler
             jQuery('#angie-top-bar-button').on('click', function(e) {
                 e.preventDefault();
-                if (typeof window.showAngieConverter === 'function') {
-                    window.showAngieConverter();
+                if (typeof window.showAngieAIConverter === 'function') {
+                    window.showAngieAIConverter();
+                } else {
+                    console.error('showAngieAIConverter not found');
+                    alert('AI Converter is loading... Please try again in a moment.');
                 }
             });
 
-            console.log('✅ Angie button added to top bar');
+            console.log('✅ Angie RED button (</>) added to top bar');
+        } else if (!topBar.length) {
+            console.warn('⚠️ Top bar not found, will retry...');
+            // Retry after 1 second
+            setTimeout(addToTopBar, 1000);
         }
     }
 
@@ -115,9 +138,9 @@ jQuery(window).on('elementor:init', function() {
         // Ctrl + Shift + H
         if (e.ctrlKey && e.shiftKey && e.keyCode === 72) {
             e.preventDefault();
-            if (typeof window.showAngieConverter === 'function') {
-                window.showAngieConverter();
-                console.log('🎨 Opened via keyboard shortcut: Ctrl+Shift+H');
+            if (typeof window.showAngieAIConverter === 'function') {
+                window.showAngieAIConverter();
+                console.log('🎨 Opened AI converter via keyboard shortcut: Ctrl+Shift+H');
             }
         }
     });

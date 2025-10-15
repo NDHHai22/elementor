@@ -12,6 +12,9 @@ use Angie\Plugin;
 use Angie\Modules\ElementorCore\Components\Kit_Provider;
 use Angie\Modules\ElementorCore\Components\Widget_Manager;
 use Angie\Modules\ElementorCore\Components\Html_To_Elementor_Converter;
+use Angie\Modules\ElementorCore\Components\AI_Settings;
+use Angie\Modules\ElementorCore\Components\AI_Converter;
+use Angie\Modules\ElementorCore\Components\AI_Settings_Page;
 use Angie\Includes\Utils;
 /**
  * Module `Elementor Editor`
@@ -45,6 +48,27 @@ class Module extends Module_Base {
 	 */
 	public $html_converter;
 
+	/**
+	 * AI Settings controller
+	 *
+	 * @var \Angie\Modules\ElementorCore\Components\AI_Settings
+	 */
+	public $ai_settings;
+
+	/**
+	 * AI Converter controller
+	 *
+	 * @var \Angie\Modules\ElementorCore\Components\AI_Converter
+	 */
+	public $ai_converter;
+
+	/**
+	 * AI Settings Page
+	 *
+	 * @var \Angie\Modules\ElementorCore\Components\AI_Settings_Page
+	 */
+	public $ai_settings_page;
+
 	public function get_name(): string {
 		return 'elementor-core';
 	}
@@ -69,23 +93,26 @@ class Module extends Module_Base {
 		$this->kit_provider = new Kit_Provider();
 		$this->widget_manager = new Widget_Manager();
 		$this->html_converter = new Html_To_Elementor_Converter();
+		$this->ai_settings = new AI_Settings();
+		$this->ai_converter = new AI_Converter();
+		$this->ai_settings_page = new AI_Settings_Page();
 	}
 
 	public function enqueue_scripts() {
-		// Enqueue HTML to Elementor converter script
+		// Enqueue AI Elementor integration script (with modal and AI API)
 		wp_enqueue_script(
-			'angie-html-to-elementor',
-			ANGIE_URL . 'modules/elementor-core/assets/js/html-to-elementor-converter.js',
-			[ 'jquery' ],
+			'angie-ai-elementor-integration',
+			ANGIE_URL . 'modules/elementor-core/assets/js/ai-elementor-integration.js',
+			[ 'jquery', 'wp-api-request' ],
 			ANGIE_VERSION,
 			true
 		);
 
-		// Enqueue Elementor integration script (button, shortcuts, etc.)
+		// Enqueue button/shortcut integration (calls AI modal)
 		wp_enqueue_script(
 			'angie-elementor-integration',
 			ANGIE_URL . 'modules/elementor-core/assets/js/elementor-integration.js',
-			[ 'jquery', 'elementor-editor', 'angie-html-to-elementor' ],
+			[ 'jquery', 'elementor-editor', 'angie-ai-elementor-integration' ],
 			ANGIE_VERSION,
 			true
 		);

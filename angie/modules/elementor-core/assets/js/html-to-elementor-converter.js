@@ -1,11 +1,13 @@
 /**
- * Angie HTML to Elementor JSON Converter
+ * Angie HTML to Elementor JSON Converter (v4 Atomic Elements)
  * 
- * JavaScript tool để convert HTML thành exact Elementor JSON format
- * Chạy trong browser console hoặc inject vào Elementor Editor
+ * JavaScript tool để convert HTML thành Elementor v4 Atomic format
+ * - Uses e-div-block instead of section/column
+ * - Class-based styling with typed values
+ * - Variants for responsive design
  * 
  * @package Angie
- * @version 1.0.0
+ * @version 2.0.0 (v4)
  */
 
 (function(window) {
@@ -17,15 +19,54 @@
     class AngieHtmlToElementor {
         constructor() {
             this.elementIdCounter = 0;
+            this.classIdCounter = 0;
         }
 
         /**
-         * Generate unique element ID (giống Elementor format)
+         * Generate unique element ID (Elementor format)
          * @returns {string} 8-character hex ID
          */
         generateId() {
-            // Elementor format: 8 hex characters
             return Math.random().toString(16).substr(2, 8);
+        }
+
+        /**
+         * Generate unique class ID for styles
+         * @returns {string} Class ID (e-abc123-xyz)
+         */
+        generateClassId() {
+            return 'e-' + Math.random().toString(16).substr(2, 6) + '-' + Math.random().toString(16).substr(2, 3);
+        }
+
+        /**
+         * Create typed value object for v4
+         * @param {string} type - Type (color, size, background, etc.)
+         * @param {*} value - Value
+         * @returns {Object} Typed value
+         */
+        createTypedValue(type, value) {
+            return {
+                $$type: type,
+                value: value
+            };
+        }
+
+        /**
+         * Create style variant for responsive/states
+         * @param {Object} props - CSS properties
+         * @param {string} breakpoint - desktop, tablet, mobile
+         * @param {string|null} state - hover, active, etc.
+         * @returns {Object} Style variant
+         */
+        createStyleVariant(props, breakpoint = 'desktop', state = null) {
+            return {
+                meta: {
+                    breakpoint: breakpoint,
+                    state: state
+                },
+                props: props,
+                custom_css: null
+            };
         }
 
         /**
@@ -54,14 +95,14 @@
         }
 
         /**
-         * Parse DOM node thành Elementor element
+         * Parse DOM node thành Elementor v4 Atomic element
          * @param {HTMLElement} node - DOM node to parse
          * @returns {Object|null} Elementor element object
          */
         parseNode(node) {
             const tagName = node.tagName.toLowerCase();
 
-            // Map HTML tags to Elementor widgets
+            // Map HTML tags to Elementor v4 widgets
             switch(tagName) {
                 case 'h1':
                 case 'h2':
@@ -72,14 +113,12 @@
                     return this.createHeading(node);
                 
                 case 'p':
-                    return this.createTextEditor(node);
+                    return this.createText(node);
                 
                 case 'img':
                     return this.createImage(node);
                 
                 case 'a':
-                    return this.createButton(node);
-                
                 case 'button':
                     return this.createButton(node);
                 
@@ -91,7 +130,7 @@
                 case 'section':
                 case 'article':
                 case 'aside':
-                    return this.createContainer(node);
+                    return this.createDivBlock(node);
                 
                 case 'video':
                     return this.createVideo(node);
@@ -106,57 +145,97 @@
         }
 
         /**
-         * Create Heading widget
+         * Create e-heading widget (v4)
          */
         createHeading(node) {
-            return {
+            const classId = this.generateClassId();
+            const color = this.getColor(node);
+            const fontSize = this.getFontSize(node);
+            
+            const props = {};
+            if (color) props.color = this.createTypedValue('color', color);
+            if (fontSize) props['font-size'] = this.createTypedValue('size', { unit: 'px', size: fontSize });
+            
+            const element = {
                 id: this.generateId(),
                 elType: 'widget',
+                widgetType: 'e-heading',
                 isInner: false,
                 isLocked: false,
                 settings: {
                     title: node.textContent.trim(),
-                    header_size: node.tagName.toLowerCase(),
-                    align: this.getAlignment(node),
-                    title_color: this.getColor(node),
-                    typography_typography: 'custom'
+                    tag: node.tagName.toLowerCase(),
+                    classes: this.createTypedValue('classes', [classId])
                 },
                 defaultEditSettings: {
                     defaultEditRoute: 'content'
                 },
                 elements: [],
-                widgetType: 'heading',
                 editSettings: {
                     defaultEditRoute: 'content'
                 },
                 htmlCache: ''
             };
+
+            // Add styles if we have any
+            if (Object.keys(props).length > 0) {
+                element.styles = {
+                    [classId]: {
+                        id: classId,
+                        type: 'class',
+                        label: node.tagName.toUpperCase(),
+                        variants: [this.createStyleVariant(props)]
+                    }
+                };
+            }
+
+            return element;
         }
 
         /**
-         * Create Text Editor widget
+         * Create e-paragraph widget (v4)
          */
-        createTextEditor(node) {
-            return {
+        createText(node) {
+            const classId = this.generateClassId();
+            const color = this.getColor(node);
+            const fontSize = this.getFontSize(node);
+            
+            const props = {};
+            if (color) props.color = this.createTypedValue('color', color);
+            if (fontSize) props['font-size'] = this.createTypedValue('size', { unit: 'px', size: fontSize });
+            
+            const element = {
                 id: this.generateId(),
                 elType: 'widget',
+                widgetType: 'e-paragraph', // v4 uses e-paragraph
                 isInner: false,
                 isLocked: false,
                 settings: {
-                    editor: node.innerHTML.trim(),
-                    text_color: this.getColor(node),
-                    typography_typography: 'custom'
+                    classes: this.createTypedValue('classes', [classId])
                 },
                 defaultEditSettings: {
                     defaultEditRoute: 'content'
                 },
                 elements: [],
-                widgetType: 'text-editor',
                 editSettings: {
                     defaultEditRoute: 'content'
                 },
                 htmlCache: ''
             };
+
+            // Add styles if we have any
+            if (Object.keys(props).length > 0) {
+                element.styles = {
+                    [classId]: {
+                        id: classId,
+                        type: 'class',
+                        label: 'Text',
+                        variants: [this.createStyleVariant(props)]
+                    }
+                };
+            }
+
+            return element;
         }
 
         /**
@@ -199,43 +278,63 @@
         }
 
         /**
-         * Create Button widget (for <a> or <button>)
+         * Create e-button widget (v4)
          */
         createButton(node) {
+            const classId = this.generateClassId();
             const text = node.textContent.trim();
             const href = node.getAttribute('href') || '#';
             const target = node.getAttribute('target') || '';
-
-            return {
+            const color = this.getColor(node);
+            const bgColor = this.getBackgroundColor(node);
+            
+            const props = {};
+            if (color) props.color = this.createTypedValue('color', color);
+            if (bgColor) {
+                props.background = this.createTypedValue('background', {
+                    type: 'classic',
+                    color: bgColor
+                });
+            }
+            
+            const element = {
                 id: this.generateId(),
                 elType: 'widget',
+                widgetType: 'e-button',
                 isInner: false,
                 isLocked: false,
                 settings: {
                     text: text,
-                    link: {
+                    url: this.createTypedValue('url', {
                         url: href,
                         is_external: target === '_blank' ? 'on' : '',
-                        nofollow: node.getAttribute('rel')?.includes('nofollow') ? 'on' : '',
-                        custom_attributes: ''
-                    },
-                    align: this.getAlignment(node),
-                    size: 'md',
-                    typography_typography: 'custom',
-                    button_type: 'primary',
-                    button_text_color: this.getColor(node),
-                    background_color: this.getBackgroundColor(node)
+                        nofollow: node.getAttribute('rel')?.includes('nofollow') ? 'on' : ''
+                    }),
+                    classes: this.createTypedValue('classes', [classId])
                 },
                 defaultEditSettings: {
                     defaultEditRoute: 'content'
                 },
                 elements: [],
-                widgetType: 'button',
                 editSettings: {
                     defaultEditRoute: 'content'
                 },
                 htmlCache: ''
             };
+
+            // Add styles if we have any
+            if (Object.keys(props).length > 0) {
+                element.styles = {
+                    [classId]: {
+                        id: classId,
+                        type: 'class',
+                        label: 'Button',
+                        variants: [this.createStyleVariant(props)]
+                    }
+                };
+            }
+
+            return element;
         }
 
         /**
@@ -347,50 +446,67 @@
         }
 
         /**
-         * Create Container (Section with Column)
+         * Create e-div-block (Container for v4)
          */
-        createContainer(node) {
+        createDivBlock(node) {
+            const classId = this.generateClassId();
             const children = [];
             
             // Parse children
             Array.from(node.children).forEach(child => {
                 const element = this.parseNode(child);
                 if (element) {
-                    element.isInner = true; // Mark as inner element
                     children.push(element);
                 }
             });
 
-            // Create column
-            const column = {
+            // Extract styles
+            const bgColor = this.getBackgroundColor(node);
+            const padding = this.getPadding(node);
+            
+            const props = {};
+            if (bgColor) {
+                props.background = this.createTypedValue('background', {
+                    type: 'classic',
+                    color: bgColor
+                });
+            }
+            if (padding) {
+                props.padding = this.createTypedValue('dimensions', padding);
+            }
+
+            const element = {
                 id: this.generateId(),
-                elType: 'column',
+                elType: 'e-div-block',
                 isInner: false,
                 isLocked: false,
                 settings: {
-                    _column_size: 100,
-                    _inline_size: null
+                    classes: this.createTypedValue('classes', [classId])
                 },
-                defaultEditSettings: {},
+                defaultEditSettings: {
+                    defaultEditRoute: 'content'
+                },
                 elements: children,
-                editSettings: {}
+                widgetType: '', // e-div-block has empty widgetType
+                editSettings: {
+                    defaultEditRoute: 'content'
+                },
+                htmlCache: null
             };
 
-            // Create section
-            return {
-                id: this.generateId(),
-                elType: 'section',
-                isInner: false,
-                isLocked: false,
-                settings: {
-                    structure: '10',
-                    content_width: 'boxed',
-                    gap: 'default'
-                },
-                defaultEditSettings: {},
-                elements: [column],
-                editSettings: {}
-            };
+            // Add styles if we have any
+            if (Object.keys(props).length > 0) {
+                element.styles = {
+                    [classId]: {
+                        id: classId,
+                        type: 'class',
+                        label: 'Container',
+                        variants: [this.createStyleVariant(props)]
+                    }
+                };
+            }
+
+            return element;
         }
 
         /**
@@ -418,12 +534,45 @@
         }
 
         /**
+         * Get font size from node
+         */
+        getFontSize(node) {
+            const fontSize = node.style.fontSize || 
+                            window.getComputedStyle(node).fontSize;
+            return parseInt(fontSize) || null;
+        }
+
+        /**
          * Get background color from node
          */
         getBackgroundColor(node) {
             const bgColor = node.style.backgroundColor || 
                            window.getComputedStyle(node).backgroundColor;
             return this.rgbToHex(bgColor) || '';
+        }
+
+        /**
+         * Get padding from node
+         */
+        getPadding(node) {
+            const style = window.getComputedStyle(node);
+            const top = parseInt(style.paddingTop) || 0;
+            const right = parseInt(style.paddingRight) || 0;
+            const bottom = parseInt(style.paddingBottom) || 0;
+            const left = parseInt(style.paddingLeft) || 0;
+            
+            if (top === 0 && right === 0 && bottom === 0 && left === 0) {
+                return null;
+            }
+            
+            return {
+                unit: 'px',
+                top: top,
+                right: right,
+                bottom: bottom,
+                left: left,
+                isLinked: top === right && right === bottom && bottom === left
+            };
         }
 
         /**
@@ -597,7 +746,7 @@
                         box-shadow: 0 10px 40px rgba(0,0,0,0.3);
                     ">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h2 style="margin: 0; color: #92003B;">Angie HTML to Elementor Converter</h2>
+                            <h2 style="margin: 0; color: #92003B;">Angie HTML → Elementor v4 Atomic</h2>
                             <button id="angie-modal-close" style="
                                 background: none;
                                 border: none;
@@ -789,7 +938,7 @@
         window.angieConverter.showModal();
     };
 
-    console.log('✅ Angie HTML to Elementor Converter loaded!');
+    console.log('✅ Angie HTML to Elementor v4 Atomic Converter loaded!');
     console.log('📝 Usage: convertHtml("<div><button>Click</button></div>")');
     console.log('🎨 Or use: showAngieConverter() for modal UI');
 

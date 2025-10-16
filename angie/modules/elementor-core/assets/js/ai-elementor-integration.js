@@ -539,6 +539,11 @@
             normalized.widgetType = element.widgetType || 'text-editor';
         }
         
+        // Keep v4 Atomic styles (class-based styling)
+        if (element.styles) {
+            normalized.styles = element.styles;
+        }
+        
         // Recursively normalize child elements
         if (element.elements && Array.isArray(element.elements)) {
             normalized.elements = element.elements.map(child => normalizeElement(child));

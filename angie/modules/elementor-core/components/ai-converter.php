@@ -111,11 +111,11 @@ class AI_Converter {
 
 		// Mode 1: Direct HTML conversion (no AI needed)
 		if ( $is_html_mode && ! $is_ai_mode ) {
-			error_log( '=== HTML-Only Mode (No AI) ===' );
+			error_log( '=== HTML-Only Mode (No AI) - Elementor v4 Atomic ===' );
 			$html_to_convert = $params['html'];
 			
-			// Step: Use SMART HTML to Elementor converter directly
-			$converter = new Smart_Html_Converter();
+			// Use Atomic converter for v4
+			$converter = new Atomic_Html_Converter();
 			
 			try {
 				$elementor_elements = $converter->parse( $html_to_convert );
@@ -127,7 +127,8 @@ class AI_Converter {
 					'success'  => true,
 					'elements' => $elementor_elements,
 					'html'     => $html_to_convert,
-					'message'  => count( $elementor_elements ) . ' element(s) converted from HTML',
+					'version'  => 'v4',
+					'message'  => count( $elementor_elements ) . ' element(s) converted from HTML (Elementor v4 Atomic)',
 				] );
 				
 			} catch ( \Exception $e ) {
@@ -153,7 +154,7 @@ class AI_Converter {
 			);
 		}
 
-		error_log( '=== AI Generation Mode ===' );
+		error_log( '=== AI Generation Mode - Elementor v4 Atomic ===' );
 		
 		// Accept either 'prompt' or 'html' as user input for AI
 		$user_input = $params['prompt'];
@@ -165,8 +166,8 @@ class AI_Converter {
 			return $generated_html;
 		}
 
-		// Step 2: Use SMART HTML to Elementor converter
-		$converter = new Smart_Html_Converter();
+		// Step 2: Use Atomic converter for v4
+		$converter = new Atomic_Html_Converter();
 		
 		try {
 			$elementor_elements = $converter->parse( $generated_html );
@@ -184,7 +185,8 @@ class AI_Converter {
 				'success'       => true,
 				'elements'      => $elementor_elements,
 				'html'          => $generated_html,
-				'message'       => 'HTML generated and converted to Elementor format with smart styling',
+				'version'       => 'v4',
+				'message'       => 'HTML generated and converted to Elementor v4 Atomic format with smart styling',
 				'debug'         => [
 					'html_length'    => strlen( $generated_html ),
 					'elements_count' => count( $elementor_elements ),

@@ -96,13 +96,11 @@ class Smart_Html_Converter {
 			case 'container':
 				return $this->create_container_from_node( $node, $styles, $classes );
 			
-			case 'button':
-				return $this->create_button( $node, $styles );
-			
-			case 'heading':
-				return $this->create_heading( $node, $this->infer_heading_tag( $styles ), $styles );
-			
-			case 'image':
+		case 'button':
+			return $this->create_button( $node, $styles );
+		
+		case 'heading':
+			return $this->create_heading( $node, strtolower( $node->nodeName ), $styles );			case 'image':
 				return $this->create_image( $node, $styles );
 			
 			case 'list':

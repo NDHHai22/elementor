@@ -638,38 +638,12 @@
                 }
             });
 
-            // CRITICAL: Mark document as modified
-            if (elementor.documents && elementor.documents.getCurrent()) {
-                const currentDoc = elementor.documents.getCurrent();
-                
-                // Set document as draft
-                if (currentDoc.editor) {
-                    currentDoc.editor.status = 'draft';
-                }
-                
-                // Mark as changed using new API
-                if ($e && $e.internal) {
-                    $e.internal('document/save/set-is-modified', { status: true });
-                } else if (currentDoc.$e) {
-                    currentDoc.$e.internal('document/save/set-is-modified', { status: true });
-                }
-            }
+            // DON'T mark document as modified yet - causes autosave which triggers "Document is not editable"
+            // Document will be marked as modified automatically when user starts editing
             
-            // Force saver to recognize changes (fallback for older versions)
-            if (elementor.saver) {
-                // Use new API if available
-                if ($e && $e.internal) {
-                    $e.internal('document/save/set-is-modified', { status: true });
-                } else {
-                    // Fallback to deprecated method
-                    elementor.saver.setFlagEditorChange(true);
-                }
-                
-                // Trigger autosave check
-                if (elementor.saver.autoSave) {
-                    elementor.saver.autoSave.update();
-                }
-            }
+            // SKIP: document/save/set-is-modified
+            // SKIP: setFlagEditorChange
+            // SKIP: autoSave.update
             
             // Trigger editor change events
             if (elementor.channels && elementor.channels.data) {
@@ -702,6 +676,28 @@
                 }
             });
             
+            // CRITICAL: Select first inserted element to trigger proper initialization
+            if (insertedElements.length > 0 && insertedElements[0]) {
+                console.log('Selecting first inserted element to initialize views');
+                setTimeout(function() {
+                    try {
+                        // Use Elementor's select command to properly initialize the element
+                        $e.run('document/elements/select', {
+                            container: insertedElements[0]
+                        });
+                        
+                        // Then deselect to avoid confusing the user
+                        setTimeout(function() {
+                            $e.run('document/elements/deselect', {
+                                container: insertedElements[0]
+                            });
+                        }, 100);
+                    } catch (selectError) {
+                        console.warn('Select element failed:', selectError);
+                    }
+                }, 200);
+            }
+            
             // Force parent container children to refresh (don't render parent itself)
             if (targetContainer && targetContainer.children) {
                 console.log('Refreshing parent container children');
@@ -727,20 +723,30 @@
                 }, 200);
             }
             
-            // Force complete preview refresh
+            // Force complete preview refresh (with delay to allow views to settle)
             setTimeout(function() {
                 console.log('Forcing complete preview refresh');
                 
-                // Method 1: Trigger history change to force re-render
-                if ($e && $e.internal) {
+                // DON'T trigger autosave - causes "Document is not editable" error
+                // Instead, open editor panel for first element to enable editing
+                
+                // Method 1: Open panel/editor to make document editable
+                if (insertedElements.length > 0 && $e && $e.run) {
+                    const firstElement = insertedElements[0];
+                    console.log('Opening editor panel for first element:', firstElement.id);
+                    
                     try {
-                        $e.internal('document/history/log-data');
-                    } catch (historyError) {
-                        console.log('History log failed:', historyError.message);
+                        // Select and open editor - this makes document editable
+                        $e.run('panel/editor/open', {
+                            model: firstElement.model || firstElement,
+                            view: firstElement.view
+                        });
+                    } catch (panelError) {
+                        console.log('Panel open failed:', panelError.message);
                     }
                 }
                 
-                // Method 2: Re-render preview iframe content
+                // Method 2: Re-render preview iframe content (WITHOUT reload)
                 if (elementor.$preview && elementor.$preview[0] && elementor.$preview[0].contentWindow) {
                     const previewWindow = elementor.$preview[0].contentWindow;
                     if (previewWindow.elementorFrontend && previewWindow.elementorFrontend.init) {

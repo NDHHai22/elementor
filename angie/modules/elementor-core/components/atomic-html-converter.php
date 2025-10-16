@@ -289,10 +289,11 @@ class Atomic_Html_Converter {
 			],
 			'elements' => [],
 			'widgetType' => $widget_type,
+			'htmlCache' => '',
+			'editor_settings' => [],
 			'editSettings' => [
 				'defaultEditRoute' => 'content',
 			],
-			'htmlCache' => '',
 		];
 
 		// Only add styles if there are actual styles

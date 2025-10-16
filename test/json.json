@@ -1,6 +1,6 @@
 [
   {
-    "id": "a676f63",
+    "id": "d71295e",
     "elType": "e-div-block",
     "isInner": false,
     "isLocked": false,
@@ -8,7 +8,7 @@
       "classes": {
         "$$type": "classes",
         "value": [
-          "e-a676f63-cb11a74"
+          "e-d71295e-cb11a74"
         ]
       }
     },
@@ -17,7 +17,7 @@
     },
     "elements": [
       {
-        "id": "e5492ea",
+        "id": "790aa53",
         "elType": "widget",
         "isInner": false,
         "isLocked": false,
@@ -29,7 +29,7 @@
           "classes": {
             "$$type": "classes",
             "value": [
-              "e-e5492ea-1abee51"
+              "e-790aa53-1abee51"
             ]
           }
         },
@@ -43,8 +43,8 @@
         },
         "htmlCache": "",
         "styles": {
-          "e-e5492ea-1abee51": {
-            "id": "e-e5492ea-1abee51",
+          "e-790aa53-1abee51": {
+            "id": "e-790aa53-1abee51",
             "label": "local",
             "type": "class",
             "variants": [
@@ -84,7 +84,7 @@
         }
       },
       {
-        "id": "cd42a57",
+        "id": "fcf52f8",
         "elType": "widget",
         "isInner": false,
         "isLocked": false,
@@ -96,7 +96,7 @@
           "classes": {
             "$$type": "classes",
             "value": [
-              "e-cd42a57-a70e9f6"
+              "e-fcf52f8-a70e9f6"
             ]
           }
         },
@@ -110,8 +110,8 @@
         },
         "htmlCache": "",
         "styles": {
-          "e-cd42a57-a70e9f6": {
-            "id": "e-cd42a57-a70e9f6",
+          "e-fcf52f8-a70e9f6": {
+            "id": "e-fcf52f8-a70e9f6",
             "label": "local",
             "type": "class",
             "variants": [
@@ -141,28 +141,28 @@
                   "padding": {
                     "$$type": "dimensions",
                     "value": {
-                      "top": {
+                      "block-start": {
                         "$$type": "size",
                         "value": {
                           "size": 15,
                           "unit": "px"
                         }
                       },
-                      "right": {
+                      "inline-end": {
                         "$$type": "size",
                         "value": {
                           "size": 30,
                           "unit": "px"
                         }
                       },
-                      "bottom": {
+                      "block-end": {
                         "$$type": "size",
                         "value": {
                           "size": 15,
                           "unit": "px"
                         }
                       },
-                      "left": {
+                      "inline-start": {
                         "$$type": "size",
                         "value": {
                           "size": 30,
@@ -202,8 +202,8 @@
       }
     ],
     "styles": {
-      "e-a676f63-cb11a74": {
-        "id": "e-a676f63-cb11a74",
+      "e-d71295e-cb11a74": {
+        "id": "e-d71295e-cb11a74",
         "label": "local",
         "type": "class",
         "variants": [
@@ -236,28 +236,28 @@
               "padding": {
                 "$$type": "dimensions",
                 "value": {
-                  "top": {
+                  "block-start": {
                     "$$type": "size",
                     "value": {
                       "size": 80,
                       "unit": "px"
                     }
                   },
-                  "right": {
+                  "inline-end": {
                     "$$type": "size",
                     "value": {
                       "size": 20,
                       "unit": "px"
                     }
                   },
-                  "bottom": {
+                  "block-end": {
                     "$$type": "size",
                     "value": {
                       "size": 80,
                       "unit": "px"
                     }
                   },
-                  "left": {
+                  "inline-start": {
                     "$$type": "size",
                     "value": {
                       "size": 20,

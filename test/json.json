@@ -1,6 +1,6 @@
 [
   {
-    "id": "c24019c",
+    "id": "a676f63",
     "elType": "e-div-block",
     "isInner": false,
     "isLocked": false,
@@ -8,7 +8,7 @@
       "classes": {
         "$$type": "classes",
         "value": [
-          "e-c24019c-c58b7d6"
+          "e-a676f63-cb11a74"
         ]
       }
     },
@@ -17,16 +17,19 @@
     },
     "elements": [
       {
-        "id": "83e8ef3",
+        "id": "e5492ea",
         "elType": "widget",
-        "widgetType": "e-paragraph",
         "isInner": false,
         "isLocked": false,
         "settings": {
+          "paragraph": {
+            "$$type": "string",
+            "value": "Welcome to Our Service"
+          },
           "classes": {
             "$$type": "classes",
             "value": [
-              "e-83e8ef3-1abee51"
+              "e-e5492ea-1abee51"
             ]
           }
         },
@@ -34,13 +37,14 @@
           "defaultEditRoute": "content"
         },
         "elements": [],
+        "widgetType": "e-paragraph",
         "editSettings": {
           "defaultEditRoute": "content"
         },
         "htmlCache": "",
         "styles": {
-          "e-83e8ef3-1abee51": {
-            "id": "e-83e8ef3-1abee51",
+          "e-e5492ea-1abee51": {
+            "id": "e-e5492ea-1abee51",
             "label": "local",
             "type": "class",
             "variants": [
@@ -80,16 +84,19 @@
         }
       },
       {
-        "id": "08512d7",
+        "id": "cd42a57",
         "elType": "widget",
-        "widgetType": "e-paragraph",
         "isInner": false,
         "isLocked": false,
         "settings": {
+          "paragraph": {
+            "$$type": "string",
+            "value": "Get Started Now"
+          },
           "classes": {
             "$$type": "classes",
             "value": [
-              "e-08512d7-a70e9f6"
+              "e-cd42a57-a70e9f6"
             ]
           }
         },
@@ -97,13 +104,14 @@
           "defaultEditRoute": "content"
         },
         "elements": [],
+        "widgetType": "e-paragraph",
         "editSettings": {
           "defaultEditRoute": "content"
         },
         "htmlCache": "",
         "styles": {
-          "e-08512d7-a70e9f6": {
-            "id": "e-08512d7-a70e9f6",
+          "e-cd42a57-a70e9f6": {
+            "id": "e-cd42a57-a70e9f6",
             "label": "local",
             "type": "class",
             "variants": [
@@ -131,10 +139,36 @@
                     "value": "#ffffff"
                   },
                   "padding": {
-                    "$$type": "size",
+                    "$$type": "dimensions",
                     "value": {
-                      "size": 15,
-                      "unit": "px 30px"
+                      "top": {
+                        "$$type": "size",
+                        "value": {
+                          "size": 15,
+                          "unit": "px"
+                        }
+                      },
+                      "right": {
+                        "$$type": "size",
+                        "value": {
+                          "size": 30,
+                          "unit": "px"
+                        }
+                      },
+                      "bottom": {
+                        "$$type": "size",
+                        "value": {
+                          "size": 15,
+                          "unit": "px"
+                        }
+                      },
+                      "left": {
+                        "$$type": "size",
+                        "value": {
+                          "size": 30,
+                          "unit": "px"
+                        }
+                      }
                     }
                   },
                   "font-size": {
@@ -151,6 +185,10 @@
                       "unit": "px"
                     }
                   },
+                  "cursor": {
+                    "$$type": "string",
+                    "value": "pointer"
+                  },
                   "text-decoration": {
                     "$$type": "string",
                     "value": "none"
@@ -163,14 +201,9 @@
         }
       }
     ],
-    "widgetType": "",
-    "editSettings": {
-      "defaultEditRoute": "content"
-    },
-    "htmlCache": null,
     "styles": {
-      "e-c24019c-c58b7d6": {
-        "id": "e-c24019c-c58b7d6",
+      "e-a676f63-cb11a74": {
+        "id": "e-a676f63-cb11a74",
         "label": "local",
         "type": "class",
         "variants": [
@@ -180,6 +213,17 @@
               "state": null
             },
             "props": {
+              "display": {
+                "$$type": "string",
+                "value": "flex"
+              },
+              "gap": {
+                "$$type": "size",
+                "value": {
+                  "size": 10,
+                  "unit": "px"
+                }
+              },
               "background": {
                 "$$type": "background",
                 "value": {
@@ -190,786 +234,56 @@
                 }
               },
               "padding": {
-                "$$type": "size",
+                "$$type": "dimensions",
                 "value": {
-                  "size": 80,
-                  "unit": "px 20px"
+                  "top": {
+                    "$$type": "size",
+                    "value": {
+                      "size": 80,
+                      "unit": "px"
+                    }
+                  },
+                  "right": {
+                    "$$type": "size",
+                    "value": {
+                      "size": 20,
+                      "unit": "px"
+                    }
+                  },
+                  "bottom": {
+                    "$$type": "size",
+                    "value": {
+                      "size": 80,
+                      "unit": "px"
+                    }
+                  },
+                  "left": {
+                    "$$type": "size",
+                    "value": {
+                      "size": 20,
+                      "unit": "px"
+                    }
+                  }
                 }
               },
               "text-align": {
                 "$$type": "string",
                 "value": "center"
+              },
+              "font-family": {
+                "$$type": "string",
+                "value": "sans-serif"
               }
             },
             "custom_css": null
           }
         ]
       }
-    }
-  },
-  {
-    "id": "417e86c",
-    "elType": "e-div-block",
-    "isInner": false,
-    "isLocked": false,
-    "settings": {
-      "classes": {
-        "$$type": "classes",
-        "value": [
-          "e-417e86c-4a77fde"
-        ]
-      }
     },
-    "defaultEditSettings": {
-      "defaultEditRoute": "content"
-    },
-    "elements": [
-      {
-        "id": "b690bfc",
-        "elType": "e-div-block",
-        "isInner": false,
-        "isLocked": false,
-        "settings": {
-          "classes": {
-            "$$type": "classes",
-            "value": [
-              "e-b690bfc-8975dc9"
-            ]
-          }
-        },
-        "defaultEditSettings": {
-          "defaultEditRoute": "content"
-        },
-        "elements": [
-          {
-            "id": "ac4649b",
-            "elType": "e-div-block",
-            "isInner": false,
-            "isLocked": false,
-            "settings": {
-              "classes": {
-                "$$type": "classes",
-                "value": [
-                  "e-ac4649b-31dbad8"
-                ]
-              }
-            },
-            "defaultEditSettings": {
-              "defaultEditRoute": "content"
-            },
-            "elements": [
-              {
-                "id": "ebb3a8c",
-                "elType": "widget",
-                "widgetType": "e-paragraph",
-                "isInner": false,
-                "isLocked": false,
-                "settings": {
-                  "classes": {
-                    "$$type": "classes",
-                    "value": [
-                      "e-ebb3a8c-c7f40ad"
-                    ]
-                  }
-                },
-                "defaultEditSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "elements": [],
-                "editSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "htmlCache": "",
-                "styles": {
-                  "e-ebb3a8c-c7f40ad": {
-                    "id": "e-ebb3a8c-c7f40ad",
-                    "label": "local",
-                    "type": "class",
-                    "variants": [
-                      {
-                        "meta": {
-                          "breakpoint": "desktop",
-                          "state": null
-                        },
-                        "props": {
-                          "font-size": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 48,
-                              "unit": "px"
-                            }
-                          },
-                          "color": {
-                            "$$type": "color",
-                            "value": "#007bff"
-                          },
-                          "margin-bottom": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 15,
-                              "unit": "px"
-                            }
-                          }
-                        },
-                        "custom_css": null
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                "id": "6f08815",
-                "elType": "widget",
-                "widgetType": "e-paragraph",
-                "isInner": false,
-                "isLocked": false,
-                "settings": {
-                  "classes": {
-                    "$$type": "classes",
-                    "value": [
-                      "e-6f08815-eb53ab6"
-                    ]
-                  }
-                },
-                "defaultEditSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "elements": [],
-                "editSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "htmlCache": "",
-                "styles": {
-                  "e-6f08815-eb53ab6": {
-                    "id": "e-6f08815-eb53ab6",
-                    "label": "local",
-                    "type": "class",
-                    "variants": [
-                      {
-                        "meta": {
-                          "breakpoint": "desktop",
-                          "state": null
-                        },
-                        "props": {
-                          "font-size": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 22,
-                              "unit": "px"
-                            }
-                          },
-                          "font-weight": {
-                            "$$type": "string",
-                            "value": "600"
-                          },
-                          "margin-bottom": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 10,
-                              "unit": "px"
-                            }
-                          }
-                        },
-                        "custom_css": null
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                "id": "edbf8f3",
-                "elType": "widget",
-                "widgetType": "e-paragraph",
-                "isInner": false,
-                "isLocked": false,
-                "settings": {
-                  "classes": {
-                    "$$type": "classes",
-                    "value": [
-                      "e-edbf8f3-eb4f8e2"
-                    ]
-                  }
-                },
-                "defaultEditSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "elements": [],
-                "editSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "htmlCache": "",
-                "styles": {
-                  "e-edbf8f3-eb4f8e2": {
-                    "id": "e-edbf8f3-eb4f8e2",
-                    "label": "local",
-                    "type": "class",
-                    "variants": [
-                      {
-                        "meta": {
-                          "breakpoint": "desktop",
-                          "state": null
-                        },
-                        "props": {
-                          "color": {
-                            "$$type": "color",
-                            "value": "#555"
-                          }
-                        },
-                        "custom_css": null
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
-            "widgetType": "",
-            "editSettings": {
-              "defaultEditRoute": "content"
-            },
-            "htmlCache": null,
-            "styles": {
-              "e-ac4649b-31dbad8": {
-                "id": "e-ac4649b-31dbad8",
-                "label": "local",
-                "type": "class",
-                "variants": [
-                  {
-                    "meta": {
-                      "breakpoint": "desktop",
-                      "state": null
-                    },
-                    "props": {
-                      "padding": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 20,
-                          "unit": "px"
-                        }
-                      }
-                    },
-                    "custom_css": null
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "id": "0caa129",
-            "elType": "e-div-block",
-            "isInner": false,
-            "isLocked": false,
-            "settings": {
-              "classes": {
-                "$$type": "classes",
-                "value": [
-                  "e-0caa129-31dbad8"
-                ]
-              }
-            },
-            "defaultEditSettings": {
-              "defaultEditRoute": "content"
-            },
-            "elements": [
-              {
-                "id": "c74e144",
-                "elType": "widget",
-                "widgetType": "e-paragraph",
-                "isInner": false,
-                "isLocked": false,
-                "settings": {
-                  "classes": {
-                    "$$type": "classes",
-                    "value": [
-                      "e-c74e144-c7f40ad"
-                    ]
-                  }
-                },
-                "defaultEditSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "elements": [],
-                "editSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "htmlCache": "",
-                "styles": {
-                  "e-c74e144-c7f40ad": {
-                    "id": "e-c74e144-c7f40ad",
-                    "label": "local",
-                    "type": "class",
-                    "variants": [
-                      {
-                        "meta": {
-                          "breakpoint": "desktop",
-                          "state": null
-                        },
-                        "props": {
-                          "font-size": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 48,
-                              "unit": "px"
-                            }
-                          },
-                          "color": {
-                            "$$type": "color",
-                            "value": "#007bff"
-                          },
-                          "margin-bottom": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 15,
-                              "unit": "px"
-                            }
-                          }
-                        },
-                        "custom_css": null
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                "id": "9ab3f6d",
-                "elType": "widget",
-                "widgetType": "e-paragraph",
-                "isInner": false,
-                "isLocked": false,
-                "settings": {
-                  "classes": {
-                    "$$type": "classes",
-                    "value": [
-                      "e-9ab3f6d-eb53ab6"
-                    ]
-                  }
-                },
-                "defaultEditSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "elements": [],
-                "editSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "htmlCache": "",
-                "styles": {
-                  "e-9ab3f6d-eb53ab6": {
-                    "id": "e-9ab3f6d-eb53ab6",
-                    "label": "local",
-                    "type": "class",
-                    "variants": [
-                      {
-                        "meta": {
-                          "breakpoint": "desktop",
-                          "state": null
-                        },
-                        "props": {
-                          "font-size": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 22,
-                              "unit": "px"
-                            }
-                          },
-                          "font-weight": {
-                            "$$type": "string",
-                            "value": "600"
-                          },
-                          "margin-bottom": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 10,
-                              "unit": "px"
-                            }
-                          }
-                        },
-                        "custom_css": null
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                "id": "ac7c2bc",
-                "elType": "widget",
-                "widgetType": "e-paragraph",
-                "isInner": false,
-                "isLocked": false,
-                "settings": {
-                  "classes": {
-                    "$$type": "classes",
-                    "value": [
-                      "e-ac7c2bc-eb4f8e2"
-                    ]
-                  }
-                },
-                "defaultEditSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "elements": [],
-                "editSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "htmlCache": "",
-                "styles": {
-                  "e-ac7c2bc-eb4f8e2": {
-                    "id": "e-ac7c2bc-eb4f8e2",
-                    "label": "local",
-                    "type": "class",
-                    "variants": [
-                      {
-                        "meta": {
-                          "breakpoint": "desktop",
-                          "state": null
-                        },
-                        "props": {
-                          "color": {
-                            "$$type": "color",
-                            "value": "#555"
-                          }
-                        },
-                        "custom_css": null
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
-            "widgetType": "",
-            "editSettings": {
-              "defaultEditRoute": "content"
-            },
-            "htmlCache": null,
-            "styles": {
-              "e-0caa129-31dbad8": {
-                "id": "e-0caa129-31dbad8",
-                "label": "local",
-                "type": "class",
-                "variants": [
-                  {
-                    "meta": {
-                      "breakpoint": "desktop",
-                      "state": null
-                    },
-                    "props": {
-                      "padding": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 20,
-                          "unit": "px"
-                        }
-                      }
-                    },
-                    "custom_css": null
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "id": "d9ff79b",
-            "elType": "e-div-block",
-            "isInner": false,
-            "isLocked": false,
-            "settings": {
-              "classes": {
-                "$$type": "classes",
-                "value": [
-                  "e-d9ff79b-31dbad8"
-                ]
-              }
-            },
-            "defaultEditSettings": {
-              "defaultEditRoute": "content"
-            },
-            "elements": [
-              {
-                "id": "98707a6",
-                "elType": "widget",
-                "widgetType": "e-paragraph",
-                "isInner": false,
-                "isLocked": false,
-                "settings": {
-                  "classes": {
-                    "$$type": "classes",
-                    "value": [
-                      "e-98707a6-c7f40ad"
-                    ]
-                  }
-                },
-                "defaultEditSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "elements": [],
-                "editSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "htmlCache": "",
-                "styles": {
-                  "e-98707a6-c7f40ad": {
-                    "id": "e-98707a6-c7f40ad",
-                    "label": "local",
-                    "type": "class",
-                    "variants": [
-                      {
-                        "meta": {
-                          "breakpoint": "desktop",
-                          "state": null
-                        },
-                        "props": {
-                          "font-size": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 48,
-                              "unit": "px"
-                            }
-                          },
-                          "color": {
-                            "$$type": "color",
-                            "value": "#007bff"
-                          },
-                          "margin-bottom": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 15,
-                              "unit": "px"
-                            }
-                          }
-                        },
-                        "custom_css": null
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                "id": "a90b460",
-                "elType": "widget",
-                "widgetType": "e-paragraph",
-                "isInner": false,
-                "isLocked": false,
-                "settings": {
-                  "classes": {
-                    "$$type": "classes",
-                    "value": [
-                      "e-a90b460-eb53ab6"
-                    ]
-                  }
-                },
-                "defaultEditSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "elements": [],
-                "editSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "htmlCache": "",
-                "styles": {
-                  "e-a90b460-eb53ab6": {
-                    "id": "e-a90b460-eb53ab6",
-                    "label": "local",
-                    "type": "class",
-                    "variants": [
-                      {
-                        "meta": {
-                          "breakpoint": "desktop",
-                          "state": null
-                        },
-                        "props": {
-                          "font-size": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 22,
-                              "unit": "px"
-                            }
-                          },
-                          "font-weight": {
-                            "$$type": "string",
-                            "value": "600"
-                          },
-                          "margin-bottom": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 10,
-                              "unit": "px"
-                            }
-                          }
-                        },
-                        "custom_css": null
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                "id": "0599d3c",
-                "elType": "widget",
-                "widgetType": "e-paragraph",
-                "isInner": false,
-                "isLocked": false,
-                "settings": {
-                  "classes": {
-                    "$$type": "classes",
-                    "value": [
-                      "e-0599d3c-eb4f8e2"
-                    ]
-                  }
-                },
-                "defaultEditSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "elements": [],
-                "editSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "htmlCache": "",
-                "styles": {
-                  "e-0599d3c-eb4f8e2": {
-                    "id": "e-0599d3c-eb4f8e2",
-                    "label": "local",
-                    "type": "class",
-                    "variants": [
-                      {
-                        "meta": {
-                          "breakpoint": "desktop",
-                          "state": null
-                        },
-                        "props": {
-                          "color": {
-                            "$$type": "color",
-                            "value": "#555"
-                          }
-                        },
-                        "custom_css": null
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
-            "widgetType": "",
-            "editSettings": {
-              "defaultEditRoute": "content"
-            },
-            "htmlCache": null,
-            "styles": {
-              "e-d9ff79b-31dbad8": {
-                "id": "e-d9ff79b-31dbad8",
-                "label": "local",
-                "type": "class",
-                "variants": [
-                  {
-                    "meta": {
-                      "breakpoint": "desktop",
-                      "state": null
-                    },
-                    "props": {
-                      "padding": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 20,
-                          "unit": "px"
-                        }
-                      }
-                    },
-                    "custom_css": null
-                  }
-                ]
-              }
-            }
-          }
-        ],
-        "widgetType": "",
-        "editSettings": {
-          "defaultEditRoute": "content"
-        },
-        "htmlCache": null,
-        "styles": {
-          "e-b690bfc-8975dc9": {
-            "id": "e-b690bfc-8975dc9",
-            "label": "local",
-            "type": "class",
-            "variants": [
-              {
-                "meta": {
-                  "breakpoint": "desktop",
-                  "state": null
-                },
-                "props": {
-                  "max-width": {
-                    "$$type": "size",
-                    "value": {
-                      "size": 1200,
-                      "unit": "px"
-                    }
-                  },
-                  "margin": {
-                    "$$type": "size",
-                    "value": {
-                      "size": 0,
-                      "unit": "px"
-                    }
-                  },
-                  "display": {
-                    "$$type": "string",
-                    "value": "flex"
-                  },
-                  "gap": {
-                    "$$type": "size",
-                    "value": {
-                      "size": 40,
-                      "unit": "px"
-                    }
-                  },
-                  "text-align": {
-                    "$$type": "string",
-                    "value": "center"
-                  }
-                },
-                "custom_css": null
-              }
-            ]
-          }
-        }
-      }
-    ],
-    "widgetType": "",
+    "editor_settings": [],
     "editSettings": {
       "defaultEditRoute": "content"
     },
-    "htmlCache": null,
-    "styles": {
-      "e-417e86c-4a77fde": {
-        "id": "e-417e86c-4a77fde",
-        "label": "local",
-        "type": "class",
-        "variants": [
-          {
-            "meta": {
-              "breakpoint": "desktop",
-              "state": null
-            },
-            "props": {
-              "padding": {
-                "$$type": "size",
-                "value": {
-                  "size": 60,
-                  "unit": "px 20px"
-                }
-              },
-              "background": {
-                "$$type": "background",
-                "value": {
-                  "color": {
-                    "$$type": "color",
-                    "value": "#ffffff"
-                  }
-                }
-              }
-            },
-            "custom_css": null
-          }
-        ]
-      }
-    }
+    "htmlCache": null
   }
 ]

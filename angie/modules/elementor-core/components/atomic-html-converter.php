@@ -37,30 +37,38 @@ class Atomic_Html_Converter {
 			return [];
 		}
 
-		error_log( '=== Atomic Converter Parse ===' );
+		try {
+			error_log( '=== Atomic Converter Parse ===' );
 
-		$dom = new \DOMDocument();
-		libxml_use_internal_errors( true );
-		
-		$wrapped_html = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>' . $html . '</body></html>';
-		$dom->loadHTML( $wrapped_html );
-		libxml_clear_errors();
+			$dom = new \DOMDocument();
+			libxml_use_internal_errors( true );
+			
+			$wrapped_html = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>' . $html . '</body></html>';
+			$dom->loadHTML( $wrapped_html );
+			libxml_clear_errors();
 
-		$elements = [];
-		$body = $dom->getElementsByTagName( 'body' )->item( 0 );
+			$elements = [];
+			$body = $dom->getElementsByTagName( 'body' )->item( 0 );
 
-		if ( $body && $body->hasChildNodes() ) {
-			foreach ( $body->childNodes as $node ) {
-				if ( $node->nodeType === XML_ELEMENT_NODE ) {
-					$element = $this->parse_node( $node );
-					if ( $element ) {
-						$elements[] = $element;
+			if ( $body && $body->hasChildNodes() ) {
+				foreach ( $body->childNodes as $node ) {
+					if ( $node->nodeType === XML_ELEMENT_NODE ) {
+						$element = $this->parse_node( $node );
+						if ( $element ) {
+							$elements[] = $element;
+						}
 					}
 				}
 			}
-		}
 
-		return $elements;
+			error_log( 'Atomic Converter: Generated ' . count( $elements ) . ' elements' );
+			return $elements;
+			
+		} catch ( \Exception $e ) {
+			error_log( 'Atomic Converter Error: ' . $e->getMessage() );
+			error_log( 'Stack trace: ' . $e->getTraceAsString() );
+			return [];
+		}
 	}
 
 	/**
@@ -72,6 +80,16 @@ class Atomic_Html_Converter {
 	private function parse_node( $node ) {
 		$tag = strtolower( $node->nodeName );
 		$styles = $this->parse_inline_styles( $node );
+		
+		// Debug logging
+		error_log( sprintf( 
+			'Parsing <%s>: %d styles found', 
+			$tag, 
+			count( $styles ) 
+		) );
+		if ( ! empty( $styles ) ) {
+			error_log( 'Styles: ' . print_r( $styles, true ) );
+		}
 		
 		// Determine element type
 		$role = $this->detect_element_role( $node, $tag );
@@ -97,26 +115,31 @@ class Atomic_Html_Converter {
 	}
 
 	/**
-	 * Detect element role
+	 * Detect element role based on HTML tag ONLY (no style inference)
 	 */
 	private function detect_element_role( $node, $tag ) {
+		// Images
 		if ( $tag === 'img' ) {
 			return 'image';
 		}
 
+		// Headings
 		if ( in_array( $tag, [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ], true ) ) {
 			return 'heading';
 		}
 
+		// Buttons (only <button> or <a> tags)
 		if ( $tag === 'button' || $tag === 'a' ) {
 			return 'button';
 		}
 
+		// Check if element has children
 		$children = $this->get_element_children( $node );
 		if ( count( $children ) > 0 ) {
-			return 'container';
+			return 'container'; // e-div-block
 		}
 
+		// Default: text element (e-paragraph)
 		return 'text';
 	}
 
@@ -125,7 +148,6 @@ class Atomic_Html_Converter {
 	 */
 	private function create_atomic_container( $node, $styles ) {
 		$element_id = $this->generate_id();
-		$class_id = 'e-' . $element_id . '-' . substr( md5( json_encode( $styles ) ), 0, 7 );
 		
 		// Parse children
 		$children = [];
@@ -138,30 +160,43 @@ class Atomic_Html_Converter {
 			}
 		}
 
-		return [
+		$element = [
 			'id'       => $element_id,
 			'elType'   => 'e-div-block',
 			'isInner'  => false,
 			'isLocked' => false,
-			'settings' => [
-				'classes' => [
-					'$$type' => 'classes',
-					'value'  => [ $class_id ],
-				],
-			],
+			'settings' => [], // e-div-block has empty settings
 			'defaultEditSettings' => [
 				'defaultEditRoute' => 'content',
 			],
 			'elements' => $children,
-			'widgetType' => '', // e-div-block has empty widgetType
+			'styles'   => [], // Will be populated if styles exist
+			'editor_settings' => [],
 			'editSettings' => [
 				'defaultEditRoute' => 'content',
 			],
 			'htmlCache' => null,
-			'styles'   => [
-				$class_id => $this->create_atomic_style( $class_id, $styles, 'container' ),
-			],
 		];
+
+		// Add styles if container has any
+		if ( ! empty( $styles ) ) {
+			$class_id = 'e-' . $element_id . '-' . substr( md5( json_encode( $styles ) ), 0, 7 );
+			
+			// Add classes to settings
+			$element['settings'] = [
+				'classes' => [
+					'$$type' => 'classes',
+					'value'  => [ $class_id ],
+				],
+			];
+			
+			// Add styles object
+			$element['styles'] = [
+				$class_id => $this->create_atomic_style( $class_id, $styles, 'container' ),
+			];
+		}
+
+		return $element;
 	}
 
 	/**
@@ -180,7 +215,10 @@ class Atomic_Html_Converter {
 	private function create_atomic_button( $node, $styles ) {
 		$href = $node->getAttribute( 'href' );
 		return $this->create_atomic_widget( 'e-button', $node, $styles, [
-			'text' => trim( $node->textContent ),
+			'text' => [
+				'$$type' => 'string',
+				'value'  => trim( $node->textContent ),
+			],
 			'link' => [
 				'url'         => $href,
 				'is_external' => '',
@@ -193,7 +231,13 @@ class Atomic_Html_Converter {
 	 * Create Atomic text (e-paragraph widget for v4)
 	 */
 	private function create_atomic_text( $node, $styles ) {
-		return $this->create_atomic_widget( 'e-paragraph', $node, $styles, [] );
+		$html = $this->get_inner_html( $node );
+		return $this->create_atomic_widget( 'e-paragraph', $node, $styles, [
+			'paragraph' => [
+				'$$type' => 'string',
+				'value'  => $html,
+			],
+		] );
 	}
 
 	/**
@@ -224,33 +268,41 @@ class Atomic_Html_Converter {
 		$element_id = $this->generate_id();
 		$class_id = 'e-' . $element_id . '-' . substr( md5( json_encode( $styles ) ), 0, 7 );
 
-		// Merge custom settings with classes
-		$settings = array_merge( $custom_settings, [
-			'classes' => [
+		// Only add classes if there are actual styles to apply
+		$has_styles = ! empty( $styles );
+		
+		if ( $has_styles ) {
+			$custom_settings['classes'] = [
 				'$$type' => 'classes',
 				'value'  => [ $class_id ],
-			],
-		] );
+			];
+		}
 
-		return [
+		$element = [
 			'id'         => $element_id,
 			'elType'     => 'widget',
-			'widgetType' => $widget_type,
 			'isInner'    => false,
 			'isLocked'   => false,
-			'settings'   => $settings,
+			'settings'   => $custom_settings,
 			'defaultEditSettings' => [
 				'defaultEditRoute' => 'content',
 			],
 			'elements' => [],
+			'widgetType' => $widget_type,
 			'editSettings' => [
 				'defaultEditRoute' => 'content',
 			],
 			'htmlCache' => '',
-			'styles'   => [
-				$class_id => $this->create_atomic_style( $class_id, $styles, $widget_type ),
-			],
 		];
+
+		// Only add styles if there are actual styles
+		if ( $has_styles ) {
+			$element['styles'] = [
+				$class_id => $this->create_atomic_style( $class_id, $styles, $widget_type ),
+			];
+		}
+
+		return $element;
 	}
 
 	/**
@@ -324,13 +376,131 @@ class Atomic_Html_Converter {
 			];
 		}
 
-		// Size properties (with units)
+		// Padding/Margin shorthand - expand to dimensions
+		if ( $property === 'padding' || $property === 'margin' ) {
+			$values = preg_split( '/\s+/', trim( $value ) );
+			
+			// If single value, use size type
+			if ( count( $values ) === 1 ) {
+				$parsed = $this->parse_size_value( $values[0] );
+				return [
+					'name'  => $property,
+					'value' => [
+						'$$type' => 'size',
+						'value'  => $parsed,
+					],
+				];
+			}
+			
+			// Multiple values - expand to logical properties (block-start, block-end, inline-start, inline-end)
+			$dimensions = $this->expand_shorthand_dimensions( $values );
+			$dimension_values = [];
+			
+			// Convert physical directions to logical properties
+			$logical_map = [
+				'top'    => 'block-start',
+				'bottom' => 'block-end',
+				'left'   => 'inline-start',
+				'right'  => 'inline-end',
+			];
+			
+			foreach ( $dimensions as $side => $side_value ) {
+				$parsed = $this->parse_size_value( $side_value );
+				$logical_side = $logical_map[ $side ];
+				$dimension_values[ $logical_side ] = [
+					'$$type' => 'size',
+					'value'  => $parsed,
+				];
+			}
+			
+			return [
+				'name'  => $property,
+				'value' => [
+					'$$type' => 'dimensions',
+					'value'  => $dimension_values,
+				],
+			];
+		}
+
+		// Border-radius - special dimensions type with corner names
+		if ( $property === 'border-radius' ) {
+			$values = preg_split( '/\s+/', trim( $value ) );
+			
+			// If single value, use size type
+			if ( count( $values ) === 1 ) {
+				$parsed = $this->parse_size_value( $values[0] );
+				return [
+					'name'  => $property,
+					'value' => [
+						'$$type' => 'size',
+						'value'  => $parsed,
+					],
+				];
+			}
+			
+			// Multiple values - expand to corners using border-radius type
+			$corners = $this->expand_border_radius( $values );
+			$corner_values = [];
+			
+			foreach ( $corners as $corner => $corner_value ) {
+				$parsed = $this->parse_size_value( $corner_value );
+				$corner_values[ $corner ] = [
+					'$$type' => 'size',
+					'value'  => $parsed,
+				];
+			}
+			
+			return [
+				'name'  => $property,
+				'value' => [
+					'$$type' => 'border-radius',
+					'value'  => $corner_values,
+				],
+			];
+		}
+
+		// Number properties (no units)
+		if ( in_array( $property, [ 'z-index' ], true ) ) {
+			return [
+				'name'  => $property,
+				'value' => [
+					'$$type' => 'number',
+					'value'  => intval( $value ),
+				],
+			];
+		}
+
+		// Opacity - size type with percentage
+		if ( $property === 'opacity' ) {
+			$numeric = floatval( $value );
+			// Convert 0-1 to 0-100%
+			if ( $numeric <= 1 ) {
+				$numeric = $numeric * 100;
+			}
+			return [
+				'name'  => $property,
+				'value' => [
+					'$$type' => 'size',
+					'value'  => [
+						'size' => $numeric,
+						'unit' => '%',
+					],
+				],
+			];
+		}
+
+		// Individual size properties (with units)
 		$size_props = [
-			'font-size', 'padding', 'margin', 'width', 'height',
+			'font-size', 'width', 'height',
 			'max-width', 'min-width', 'max-height', 'min-height',
-			'border-radius', 'border-width', 'gap',
+			'border-width', 'gap',
 			'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
 			'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+			// Logical properties for positioning
+			'inset-block-start', 'inset-block-end', 'inset-inline-start', 'inset-inline-end',
+			'scroll-margin-top', 'scroll-margin-bottom', 'scroll-margin-left', 'scroll-margin-right',
+			// Physical positioning fallbacks
+			'top', 'right', 'bottom', 'left',
 		];
 
 		if ( in_array( $property, $size_props, true ) ) {
@@ -348,7 +518,9 @@ class Atomic_Html_Converter {
 		$string_props = [
 			'display', 'flex-direction', 'justify-content', 'align-items',
 			'text-align', 'font-weight', 'text-decoration', 'font-style',
-			'text-transform', 'position', 'overflow',
+			'text-transform', 'position', 'overflow', 'cursor',
+			'font-family', 'flex-wrap', 'align-content',
+			'border-style', 'mix-blend-mode',
 		];
 
 		if ( in_array( $property, $string_props, true ) ) {
@@ -360,6 +532,25 @@ class Atomic_Html_Converter {
 				],
 			];
 		}
+
+		// Box-shadow - complex type (skip for now to avoid validation errors)
+		if ( $property === 'box-shadow' && $value !== 'none' ) {
+			// TODO: Implement proper box-shadow parser
+			// Box-shadow is very complex with multiple shadows, inset, etc.
+			// For now, skip it to avoid validation errors
+			error_log( "Box-shadow skipped (complex property): $value" );
+			return null;
+		}
+
+		// Transform, transition, filter, backdrop-filter - extremely complex, skip for now
+		$complex_props = [ 'transform', 'transition', 'filter', 'backdrop-filter' ];
+		if ( in_array( $property, $complex_props, true ) ) {
+			error_log( "Complex property skipped: $property = $value" );
+			return null;
+		}
+
+		// Log unknown properties for debugging
+		error_log( "Unknown CSS property skipped: $property = $value" );
 
 		// Unknown property - skip
 		return null;
@@ -375,6 +566,102 @@ class Atomic_Html_Converter {
 		return [
 			'size' => ! empty( $matches[1] ) ? floatval( $matches[1] ) : 0,
 			'unit' => ! empty( $matches[2] ) ? trim( $matches[2] ) : 'px',
+		];
+	}
+
+	/**
+	 * Expand shorthand dimensions (e.g., "10px 20px" -> top, right, bottom, left)
+	 * 
+	 * @param array $values Array of size values.
+	 * @return array Associative array with 'top', 'right', 'bottom', 'left'.
+	 */
+	private function expand_shorthand_dimensions( $values ) {
+		$count = count( $values );
+		
+		// 1 value: all sides
+		if ( $count === 1 ) {
+			return [
+				'top'    => $values[0],
+				'right'  => $values[0],
+				'bottom' => $values[0],
+				'left'   => $values[0],
+			];
+		}
+		
+		// 2 values: top/bottom, left/right
+		if ( $count === 2 ) {
+			return [
+				'top'    => $values[0],
+				'right'  => $values[1],
+				'bottom' => $values[0],
+				'left'   => $values[1],
+			];
+		}
+		
+		// 3 values: top, left/right, bottom
+		if ( $count === 3 ) {
+			return [
+				'top'    => $values[0],
+				'right'  => $values[1],
+				'bottom' => $values[2],
+				'left'   => $values[1],
+			];
+		}
+		
+		// 4 values: top, right, bottom, left
+		return [
+			'top'    => $values[0],
+			'right'  => $values[1],
+			'bottom' => $values[2],
+			'left'   => $values[3],
+		];
+	}
+
+	/**
+	 * Expand border-radius shorthand to corner names
+	 * 
+	 * @param array $values Array of size values.
+	 * @return array Associative array with logical corner names.
+	 */
+	private function expand_border_radius( $values ) {
+		$count = count( $values );
+		
+		// 1 value: all corners
+		if ( $count === 1 ) {
+			return [
+				'start-start' => $values[0],
+				'start-end'   => $values[0],
+				'end-start'   => $values[0],
+				'end-end'     => $values[0],
+			];
+		}
+		
+		// 2 values: top-left/bottom-right, top-right/bottom-left
+		if ( $count === 2 ) {
+			return [
+				'start-start' => $values[0],
+				'start-end'   => $values[1],
+				'end-start'   => $values[1],
+				'end-end'     => $values[0],
+			];
+		}
+		
+		// 3 values: top-left, top-right/bottom-left, bottom-right
+		if ( $count === 3 ) {
+			return [
+				'start-start' => $values[0],
+				'start-end'   => $values[1],
+				'end-start'   => $values[1],
+				'end-end'     => $values[2],
+			];
+		}
+		
+		// 4 values: top-left, top-right, bottom-right, bottom-left
+		return [
+			'start-start' => $values[0],
+			'start-end'   => $values[1],
+			'end-end'     => $values[2],
+			'end-start'   => $values[3],
 		];
 	}
 

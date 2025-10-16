@@ -30,7 +30,6 @@ services:
     restart: always
     volumes:
       # developing plugin / theme
-      - ./elementor/build:/var/www/html/wp-content/plugins/elementor
       - ./angie:/var/www/html/wp-content/plugins/angie
       # Custom PHP configuration - use uploads.ini for PHP-FPM
       - ./custom-php.ini:/usr/local/etc/php/conf.d/uploads.ini

@@ -196,40 +196,41 @@
          * Create e-paragraph widget (v4)
          */
         createText(node) {
-            const classId = this.generateClassId();
             const color = this.getColor(node);
             const fontSize = this.getFontSize(node);
-            
-            const props = {};
-            if (color) props.color = this.createTypedValue('color', color);
-            if (fontSize) props['font-size'] = this.createTypedValue('size', { unit: 'px', size: fontSize });
             
             const element = {
                 id: this.generateId(),
                 elType: 'widget',
-                widgetType: 'e-paragraph', // v4 uses e-paragraph
                 isInner: false,
                 isLocked: false,
                 settings: {
-                    classes: this.createTypedValue('classes', [classId])
+                    paragraph: this.createTypedValue('string', node.innerHTML.trim())
                 },
                 defaultEditSettings: {
                     defaultEditRoute: 'content'
                 },
                 elements: [],
+                widgetType: 'e-paragraph',
                 editSettings: {
                     defaultEditRoute: 'content'
                 },
                 htmlCache: ''
             };
 
-            // Add styles if we have any
-            if (Object.keys(props).length > 0) {
+            // Only add styles if we have CSS
+            if (color || fontSize) {
+                const classId = this.generateClassId();
+                const props = {};
+                if (color) props.color = this.createTypedValue('color', color);
+                if (fontSize) props['font-size'] = this.createTypedValue('size', { unit: 'px', size: fontSize });
+                
+                element.settings.classes = this.createTypedValue('classes', [classId]);
                 element.styles = {
                     [classId]: {
                         id: classId,
                         type: 'class',
-                        label: 'Text',
+                        label: 'local',
                         variants: [this.createStyleVariant(props)]
                     }
                 };
@@ -300,22 +301,17 @@
             const element = {
                 id: this.generateId(),
                 elType: 'widget',
-                widgetType: 'e-button',
                 isInner: false,
                 isLocked: false,
                 settings: {
-                    text: text,
-                    url: this.createTypedValue('url', {
-                        url: href,
-                        is_external: target === '_blank' ? 'on' : '',
-                        nofollow: node.getAttribute('rel')?.includes('nofollow') ? 'on' : ''
-                    }),
+                    text: this.createTypedValue('string', text),
                     classes: this.createTypedValue('classes', [classId])
                 },
                 defaultEditSettings: {
                     defaultEditRoute: 'content'
                 },
                 elements: [],
+                widgetType: 'e-button',
                 editSettings: {
                     defaultEditRoute: 'content'
                 },
@@ -449,7 +445,6 @@
          * Create e-div-block (Container for v4)
          */
         createDivBlock(node) {
-            const classId = this.generateClassId();
             const children = [];
             
             // Parse children
@@ -460,53 +455,23 @@
                 }
             });
 
-            // Extract styles
-            const bgColor = this.getBackgroundColor(node);
-            const padding = this.getPadding(node);
-            
-            const props = {};
-            if (bgColor) {
-                props.background = this.createTypedValue('background', {
-                    type: 'classic',
-                    color: bgColor
-                });
-            }
-            if (padding) {
-                props.padding = this.createTypedValue('dimensions', padding);
-            }
-
-            const element = {
+            return {
                 id: this.generateId(),
                 elType: 'e-div-block',
                 isInner: false,
                 isLocked: false,
-                settings: {
-                    classes: this.createTypedValue('classes', [classId])
-                },
+                settings: [], // e-div-block has empty settings
                 defaultEditSettings: {
                     defaultEditRoute: 'content'
                 },
                 elements: children,
-                widgetType: '', // e-div-block has empty widgetType
+                styles: [], // e-div-block has empty styles array
+                editor_settings: [],
                 editSettings: {
                     defaultEditRoute: 'content'
                 },
                 htmlCache: null
             };
-
-            // Add styles if we have any
-            if (Object.keys(props).length > 0) {
-                element.styles = {
-                    [classId]: {
-                        id: classId,
-                        type: 'class',
-                        label: 'Container',
-                        variants: [this.createStyleVariant(props)]
-                    }
-                };
-            }
-
-            return element;
         }
 
         /**

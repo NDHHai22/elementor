@@ -526,22 +526,19 @@
      * Normalize element to ensure it has all required Elementor properties
      */
     function normalizeElement(element) {
-        // Ensure element has all required base properties
+        // For v4 Atomic Elements, pass through all fields as-is
+        // Just ensure ID and validate structure
         const normalized = {
+            ...element, // Keep all original fields
             id: element.id || generateRandomId(),
             elType: element.elType || 'widget',
             settings: element.settings || {},
             elements: []
         };
         
-        // Add type-specific properties
-        if (element.elType === 'widget') {
-            normalized.widgetType = element.widgetType || 'text-editor';
-        }
-        
-        // Keep v4 Atomic styles (class-based styling)
-        if (element.styles) {
-            normalized.styles = element.styles;
+        // Add widgetType if missing for widget elements
+        if (element.elType === 'widget' && !normalized.widgetType) {
+            normalized.widgetType = 'text-editor';
         }
         
         // Recursively normalize child elements
@@ -596,24 +593,45 @@
                 console.log(`Inserting element ${index + 1}:`, element);
                 
                 try {
-                    // Insert element using Elementor's command system
-                    const result = $e.run('document/elements/create', {
-                        model: element,
-                        container: targetContainer,
-                        options: {
-                            at: index,  // Insert at specific position
-                            edit: false  // Don't open edit panel
+                    // Try v4-specific command first, fallback to v3
+                    let result;
+                    
+                    // Check if this is an Atomic element (v4)
+                    const isAtomicElement = element.elType && element.elType.startsWith('e-');
+                    
+                    if (isAtomicElement) {
+                        console.log('Detected v4 Atomic Element, trying atomic-specific insert...');
+                        
+                        // Try v4 command
+                        try {
+                            result = $e.run('document/atomic/create', {
+                                model: element,
+                                container: targetContainer,
+                                options: { at: index, edit: false }
+                            });
+                        } catch (atomicError) {
+                            console.log('Atomic command failed, falling back to standard create:', atomicError.message);
                         }
-                    });
+                    }
+                    
+                    // Fallback to standard command
+                    if (!result) {
+                        result = $e.run('document/elements/create', {
+                            model: element,
+                            container: targetContainer,
+                            options: {
+                                at: index,
+                                edit: false
+                            }
+                        });
+                    }
                     
                     if (result) {
                         insertedElements.push(result);
-                        console.log(`Element ${index + 1} inserted successfully`);
-                        
-                        // Force model to be editable
-                        if (result.model) {
-                            result.model.trigger('request:edit');
-                        }
+                        console.log(`Element ${index + 1} inserted:`, result);
+                        console.log('Has view?', !!result.view);
+                        console.log('Has model?', !!result.model);
+                        console.log('Result type:', result.constructor.name);
                     }
                 } catch (insertError) {
                     console.error(`Failed to insert element ${index + 1}:`, insertError, element);
@@ -629,15 +647,23 @@
                     currentDoc.editor.status = 'draft';
                 }
                 
-                // Mark as changed
-                if (currentDoc.$e) {
+                // Mark as changed using new API
+                if ($e && $e.internal) {
+                    $e.internal('document/save/set-is-modified', { status: true });
+                } else if (currentDoc.$e) {
                     currentDoc.$e.internal('document/save/set-is-modified', { status: true });
                 }
             }
             
-            // Force saver to recognize changes
+            // Force saver to recognize changes (fallback for older versions)
             if (elementor.saver) {
-                elementor.saver.setFlagEditorChange(true);
+                // Use new API if available
+                if ($e && $e.internal) {
+                    $e.internal('document/save/set-is-modified', { status: true });
+                } else {
+                    // Fallback to deprecated method
+                    elementor.saver.setFlagEditorChange(true);
+                }
                 
                 // Trigger autosave check
                 if (elementor.saver.autoSave) {
@@ -650,6 +676,48 @@
                 elementor.channels.data.trigger('document:loaded');
             }
             
+            // CRITICAL: Force render all inserted element views
+            insertedElements.forEach(function(container) {
+                if (container && container.view) {
+                    console.log('Forcing view render for:', container.id);
+                    
+                    try {
+                        // Make view interactive by triggering events
+                        if (container.view.triggerMethod) {
+                            container.view.triggerMethod('render:after');
+                        }
+                        
+                        // Re-initialize element handlers
+                        if (container.view.onElementChange) {
+                            container.view.onElementChange();
+                        }
+                        
+                        // Trigger ready event
+                        if (container.view.triggerMethod) {
+                            container.view.triggerMethod('element:ready');
+                        }
+                    } catch (viewError) {
+                        console.warn('View render error for', container.id, viewError);
+                    }
+                }
+            });
+            
+            // Force parent container children to refresh (don't render parent itself)
+            if (targetContainer && targetContainer.children) {
+                console.log('Refreshing parent container children');
+                setTimeout(function() {
+                    targetContainer.children.forEach(function(childContainer) {
+                        if (childContainer && childContainer.view && childContainer.view.render) {
+                            try {
+                                childContainer.view.render();
+                            } catch (e) {
+                                // Ignore render errors
+                            }
+                        }
+                    });
+                }, 100);
+            }
+            
             // Force navigator refresh (shows delete buttons)
             if (elementor.navigator) {
                 setTimeout(function() {
@@ -658,6 +726,62 @@
                     }
                 }, 200);
             }
+            
+            // Force complete preview refresh
+            setTimeout(function() {
+                console.log('Forcing complete preview refresh');
+                
+                // Method 1: Trigger history change to force re-render
+                if ($e && $e.internal) {
+                    try {
+                        $e.internal('document/history/log-data');
+                    } catch (historyError) {
+                        console.log('History log failed:', historyError.message);
+                    }
+                }
+                
+                // Method 2: Re-render preview iframe content
+                if (elementor.$preview && elementor.$preview[0] && elementor.$preview[0].contentWindow) {
+                    const previewWindow = elementor.$preview[0].contentWindow;
+                    if (previewWindow.elementorFrontend && previewWindow.elementorFrontend.init) {
+                        console.log('Re-initializing frontend in preview');
+                        previewWindow.elementorFrontend.init();
+                    }
+                }
+                
+                // Method 3: Trigger preview change event
+                if (elementor.channels && elementor.channels.editor) {
+                    elementor.channels.editor.trigger('preview:loaded');
+                }
+                
+                // Method 4: Force section refresh - render ALL containers
+                const currentDoc = elementor.documents.getCurrent();
+                if (currentDoc && currentDoc.container) {
+                    console.log('Re-rendering all document containers');
+                    
+                    // Get all top-level containers
+                    const renderContainer = function(container) {
+                        if (container.view && container.view.render) {
+                            try {
+                                console.log('Rendering container:', container.id, container.type);
+                                container.view.render();
+                            } catch (renderError) {
+                                console.log('Skip render for', container.id, '- no template');
+                            }
+                        }
+                        
+                        // Recursively render children
+                        if (container.children && container.children.length > 0) {
+                            container.children.forEach(renderContainer);
+                        }
+                    };
+                    
+                    // Render document root and all descendants
+                    if (currentDoc.container.children) {
+                        currentDoc.container.children.forEach(renderContainer);
+                    }
+                }
+            }, 400);
 
             showStatus(`✅ ${insertedElements.length} element(s) inserted successfully!`, 'success');
             

@@ -1,4 +1,0 @@
-			    	            <button class="e-button-base"  >
-            Click here
-        </button>
-    		

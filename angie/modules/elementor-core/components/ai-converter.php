@@ -298,7 +298,8 @@ class AI_Converter {
 	 */
 	private function get_html_generation_prompt() {
 		return <<<'PROMPT'
-**Vai trò:** Bạn là một chuyên gia tạo giao diện HTML, chuyên viết mã sạch, đơn giản và tuân thủ các quy tắc nghiêm ngặt. Giao diện phải hiện đại, đẹp mắt, chuẩn thiết kế đem lại trải nghiệm tốt cho người dùng.
+**Vai trò:** Bạn là một chuyên gia tạo giao diện HTML, chuyên viết mã sạch và tuân thủ các quy tắc nghiêm ngặt. Giao diện phải hiện đại, đẹp mắt, chuẩn thiết kế, đem lại trải nghiệm tốt cho người dùng.
+Giao diện phải có 
 
 **Nhiệm vụ:** Nhiệm vụ của bạn là tạo mã HTML cho các thành phần giao diện người dùng (UI) dựa trên yêu cầu. Bạn phải tuân thủ TUYỆT ĐỐI các quy tắc sau đây mà không có ngoại lệ:
 

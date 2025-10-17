@@ -351,6 +351,9 @@ class Atomic_Html_Converter {
 
 		// Post-process: Group individual padding/margin properties into dimensions
 		$props = $this->group_individual_properties( $props );
+		
+		// Post-process: Merge background properties (size, position, repeat, attachment)
+		$props = $this->merge_background_properties( $props, $css_styles );
 
 		return [
 			'id'    => $class_id,
@@ -446,6 +449,68 @@ class Atomic_Html_Converter {
 	}
 
 	/**
+	 * Merge background properties (size, position, repeat, attachment) into background overlay
+	 * 
+	 * @param array $props Atomic props array.
+	 * @param array $css_styles Original CSS styles.
+	 * @return array Modified props with merged background.
+	 */
+	private function merge_background_properties( $props, $css_styles ) {
+		// Only process if background exists and is an image overlay
+		if ( ! isset( $props['background'] ) ) {
+			return $props;
+		}
+		
+		$background = $props['background'];
+		
+		// Check if it's a background-image-overlay
+		if ( ! isset( $background['value']['background-overlay']['value'][0]['$$type'] ) ||
+		     $background['value']['background-overlay']['value'][0]['$$type'] !== 'background-image-overlay' ) {
+			return $props;
+		}
+		
+		// Get reference to image overlay value
+		$overlay = &$background['value']['background-overlay']['value'][0]['value'];
+		
+		// Merge background-size
+		if ( isset( $css_styles['background-size'] ) ) {
+			$overlay['size'] = [
+				'$$type' => 'string',
+				'value'  => $css_styles['background-size'],
+			];
+		}
+		
+		// Merge background-position
+		if ( isset( $css_styles['background-position'] ) ) {
+			$overlay['position'] = [
+				'$$type' => 'string',
+				'value'  => $css_styles['background-position'],
+			];
+		}
+		
+		// Merge background-repeat
+		if ( isset( $css_styles['background-repeat'] ) ) {
+			$overlay['repeat'] = [
+				'$$type' => 'string',
+				'value'  => $css_styles['background-repeat'],
+			];
+		}
+		
+		// Merge background-attachment
+		if ( isset( $css_styles['background-attachment'] ) ) {
+			$overlay['attachment'] = [
+				'$$type' => 'string',
+				'value'  => $css_styles['background-attachment'],
+			];
+		}
+		
+		// Update props with merged background
+		$props['background'] = $background;
+		
+		return $props;
+	}
+
+	/**
 	 * Convert CSS property to Atomic typed prop
 	 *
 	 * @param string $property CSS property name.
@@ -453,6 +518,12 @@ class Atomic_Html_Converter {
 	 * @return array|null Atomic prop or null.
 	 */
 	private function css_to_atomic_prop( $property, $value ) {
+		// Skip background helper properties - they will be merged into background later
+		$skip_props = [ 'background-size', 'background-position', 'background-repeat', 'background-attachment' ];
+		if ( in_array( $property, $skip_props, true ) ) {
+			return null;
+		}
+		
 		// Color properties
 		if ( in_array( $property, [ 'color', 'border-color' ], true ) ) {
 			return [
@@ -464,7 +535,79 @@ class Atomic_Html_Converter {
 			];
 		}
 
-		// Background
+		// Background-image with url()
+		if ( $property === 'background-image' ) {
+			// Extract URL from url('...')
+			if ( preg_match( '/url\([\'"]?([^\'"]+)[\'"]?\)/i', $value, $matches ) ) {
+				$image_url = $matches[1];
+				
+				// Upload image to WordPress and get attachment ID
+				$attachment_id = $this->upload_image_from_url( $image_url );
+				
+				if ( $attachment_id ) {
+					return [
+						'name'  => 'background',
+						'value' => [
+							'$$type' => 'background',
+							'value'  => [
+								'background-overlay' => [
+									'$$type' => 'background-overlay',
+									'value'  => [
+										[
+											'$$type' => 'background-image-overlay',
+											'value'  => [
+												'image' => [
+													'$$type' => 'image',
+													'value'  => [
+														'src' => [
+															'$$type' => 'image-src',
+															'value'  => [
+																'id' => [
+																	'$$type' => 'image-attachment-id',
+																	'value'  => $attachment_id,
+																],
+																'url' => null,
+															],
+														],
+														'size' => [
+															'$$type' => 'string',
+															'value'  => 'large',
+														],
+													],
+												],
+												'position' => [
+													'$$type' => 'string',
+													'value'  => 'center center', // Will be overridden by background-position if present
+												],
+												'repeat' => [
+													'$$type' => 'string',
+													'value'  => 'no-repeat', // Default for images
+												],
+												'size' => [
+													'$$type' => 'string',
+													'value'  => 'cover', // Will be overridden by background-size if present
+												],
+												'attachment' => [
+													'$$type' => 'string',
+													'value'  => 'scroll', // Default, can be 'fixed' or 'scroll'
+												],
+											],
+										],
+									],
+								],
+							],
+						],
+					];
+				} else {
+					error_log( "Failed to upload background image: $image_url" );
+					return null;
+				}
+			}
+			
+			return null;
+		}
+
+		// Background-color or background shorthand
 		if ( $property === 'background-color' || $property === 'background' ) {
 			// Check if it's a gradient
 			if ( strpos( $value, 'gradient' ) !== false ) {
@@ -1016,6 +1159,73 @@ class Atomic_Html_Converter {
 				'value'  => $stops,
 			],
 		];
+	}
+
+	/**
+	 * Upload image from URL to WordPress Media Library
+	 * 
+	 * @param string $image_url Image URL
+	 * @return int|false Attachment ID or false on failure
+	 */
+	private function upload_image_from_url( $image_url ) {
+		// Check if image already exists by URL
+		global $wpdb;
+		$existing = $wpdb->get_var( 
+			$wpdb->prepare( 
+				"SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_source_url' AND meta_value = %s LIMIT 1",
+				$image_url 
+			)
+		);
+		
+		if ( $existing ) {
+			error_log( "Image already exists with ID: $existing" );
+			return intval( $existing );
+		}
+		
+		// Download image
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+		
+		$temp_file = download_url( $image_url );
+		
+		if ( is_wp_error( $temp_file ) ) {
+			error_log( 'Failed to download image: ' . $temp_file->get_error_message() );
+			return false;
+		}
+		
+		// Get file name from URL
+		$file_name = basename( parse_url( $image_url, PHP_URL_PATH ) );
+		
+		// If no extension, add .jpg
+		if ( ! preg_match( '/\.(jpg|jpeg|png|gif|webp)$/i', $file_name ) ) {
+			$file_name .= '.jpg';
+		}
+		
+		// Prepare file array
+		$file_array = [
+			'name'     => $file_name,
+			'tmp_name' => $temp_file,
+		];
+		
+		// Upload to Media Library
+		$attachment_id = media_handle_sideload( $file_array, 0 );
+		
+		// Clean up temp file
+		if ( file_exists( $temp_file ) ) {
+			@unlink( $temp_file );
+		}
+		
+		if ( is_wp_error( $attachment_id ) ) {
+			error_log( 'Failed to upload image: ' . $attachment_id->get_error_message() );
+			return false;
+		}
+		
+		// Store source URL as meta for future reference
+		update_post_meta( $attachment_id, '_source_url', $image_url );
+		
+		error_log( "Image uploaded successfully with ID: $attachment_id" );
+		return $attachment_id;
 	}
 
 	/**

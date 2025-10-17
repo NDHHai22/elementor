@@ -78,6 +78,16 @@ class Atomic_Html_Converter {
 	 * @return array|null Atomic element or null.
 	 */
 	private function parse_node( $node ) {
+		// Skip comment nodes
+		if ( $node->nodeType === XML_COMMENT_NODE ) {
+			return null;
+		}
+		
+		// Skip text nodes
+		if ( $node->nodeType === XML_TEXT_NODE ) {
+			return null;
+		}
+		
 		$tag = strtolower( $node->nodeName );
 		$styles = $this->parse_inline_styles( $node );
 		
@@ -131,6 +141,11 @@ class Atomic_Html_Converter {
 		// Buttons (only <button> or <a> tags)
 		if ( $tag === 'button' || $tag === 'a' ) {
 			return 'button';
+		}
+
+		// Inline text elements - always treat as text, never container
+		if ( in_array( $tag, [ 'span', 'em', 'strong', 'b', 'i', 'u', 'mark', 'small', 'sub', 'sup' ], true ) ) {
+			return 'text';
 		}
 
 		// Check if element has children
@@ -213,18 +228,27 @@ class Atomic_Html_Converter {
 	 * Create Atomic button (e-button widget)
 	 */
 	private function create_atomic_button( $node, $styles ) {
-		$href = $node->getAttribute( 'href' );
-		return $this->create_atomic_widget( 'e-button', $node, $styles, [
+		$settings = [
 			'text' => [
 				'$$type' => 'string',
 				'value'  => trim( $node->textContent ),
 			],
-			'link' => [
-				'url'         => $href,
-				'is_external' => '',
-				'nofollow'    => '',
-			],
-		] );
+		];
+		
+		// Only add link if href exists (for <a> tags)
+		$href = $node->getAttribute( 'href' );
+		if ( ! empty( $href ) ) {
+			$settings['link'] = [
+				'$$type' => 'link',
+				'value'  => [
+					'url'         => $href,
+					'is_external' => '',
+					'nofollow'    => '',
+				],
+			];
+		}
+		
+		return $this->create_atomic_widget( 'e-button', $node, $styles, $settings );
 	}
 
 	/**
@@ -325,6 +349,9 @@ class Atomic_Html_Converter {
 			}
 		}
 
+		// Post-process: Group individual padding/margin properties into dimensions
+		$props = $this->group_individual_properties( $props );
+
 		return [
 			'id'    => $class_id,
 			'label' => 'local',
@@ -340,6 +367,82 @@ class Atomic_Html_Converter {
 				],
 			],
 		];
+	}
+
+	/**
+	 * Group individual padding/margin properties into dimensions
+	 * 
+	 * @param array $props Atomic props array.
+	 * @return array Modified props with grouped dimensions.
+	 */
+	private function group_individual_properties( $props ) {
+		// Check for padding individual properties
+		$padding_sides = [ 'padding-top', 'padding-right', 'padding-bottom', 'padding-left' ];
+		$has_all_padding = true;
+		foreach ( $padding_sides as $side ) {
+			if ( ! isset( $props[ $side ] ) ) {
+				$has_all_padding = false;
+				break;
+			}
+		}
+
+		// Group padding into dimensions with logical properties
+		if ( $has_all_padding ) {
+			$logical_map = [
+				'padding-top'    => 'block-start',
+				'padding-bottom' => 'block-end',
+				'padding-left'   => 'inline-start',
+				'padding-right'  => 'inline-end',
+			];
+
+			$dimension_values = [];
+			foreach ( $padding_sides as $side ) {
+				$logical_side = $logical_map[ $side ];
+				// Props already have $$type and value structure, just use them directly
+				$dimension_values[ $logical_side ] = $props[ $side ];
+				unset( $props[ $side ] ); // Remove individual property
+			}
+
+			$props['padding'] = [
+				'$$type' => 'dimensions',
+				'value'  => $dimension_values,
+			];
+		}
+
+		// Check for margin individual properties
+		$margin_sides = [ 'margin-top', 'margin-right', 'margin-bottom', 'margin-left' ];
+		$has_all_margin = true;
+		foreach ( $margin_sides as $side ) {
+			if ( ! isset( $props[ $side ] ) ) {
+				$has_all_margin = false;
+				break;
+			}
+		}
+
+		// Group margin into dimensions with logical properties
+		if ( $has_all_margin ) {
+			$logical_map = [
+				'margin-top'    => 'block-start',
+				'margin-bottom' => 'block-end',
+				'margin-left'   => 'inline-start',
+				'margin-right'  => 'inline-end',
+			];
+
+			$dimension_values = [];
+			foreach ( $margin_sides as $side ) {
+				$logical_side = $logical_map[ $side ];
+				// Props already have $$type and value structure, just use them directly
+				$dimension_values[ $logical_side ] = $props[ $side ];
+				unset( $props[ $side ] ); // Remove individual property
+			}
+
+			$props['margin'] = [
+				'$$type' => 'dimensions',
+				'value'  => $dimension_values,
+			];
+		}
+
+		return $props;
 	}
 
 	/**
@@ -363,11 +466,35 @@ class Atomic_Html_Converter {
 
 		// Background
 		if ( $property === 'background-color' || $property === 'background' ) {
-			// Check if it's a gradient (too complex to parse)
+			// Check if it's a gradient
 			if ( strpos( $value, 'gradient' ) !== false ) {
-				error_log( "Gradient background skipped (too complex): $value" );
-				error_log( "Please set gradient manually in Elementor editor" );
-				return null;
+				$gradient = $this->parse_gradient( $value );
+				if ( $gradient ) {
+					return [
+						'name'  => 'background',
+						'value' => [
+							'$$type' => 'background',
+							'value'  => [
+								'color' => [
+									'$$type' => 'color',
+									'value'  => 'transparent',
+								],
+								'background-overlay' => [
+									'$$type' => 'background-overlay',
+									'value'  => [
+										[
+											'$$type' => 'background-gradient-overlay',
+											'value'  => $gradient,
+										],
+									],
+								],
+							],
+						],
+					];
+				} else {
+					error_log( "Gradient format not recognized, skipping: $value" );
+					return null;
+				}
 			}
 			
 			// Simple solid color background
@@ -513,7 +640,26 @@ class Atomic_Html_Converter {
 		];
 
 		if ( in_array( $property, $size_props, true ) ) {
-			$parsed = $this->parse_size_value( $value );
+			// Pass property name to parse_size_value for unitless detection (e.g., line-height)
+			$parsed = $this->parse_size_value( $value, $property );
+			return [
+				'name'  => $property,
+				'value' => [
+					'$$type' => 'size',
+					'value'  => $parsed,
+				],
+			];
+		}
+
+		// Line-height special handling - unitless values default to 'em'
+		if ( $property === 'line-height' ) {
+			$parsed = $this->parse_size_value( $value, $property );
+			
+			// If unitless, default to 'em' unit
+			if ( empty( $parsed['unit'] ) ) {
+				$parsed['unit'] = 'em';
+			}
+			
 			return [
 				'name'  => $property,
 				'value' => [
@@ -615,9 +761,12 @@ class Atomic_Html_Converter {
 
 	/**
 	 * Parse size value (e.g., "10px" -> ["size" => 10, "unit" => "px"])
-	 * Supports: px, em, rem, %, vh, vw, auto, etc.
+	 * Supports: px, em, rem, %, vh, vw, auto, unitless (for line-height)
+	 * 
+	 * @param string $value CSS value to parse
+	 * @param string $property Property name (optional, for unitless detection)
 	 */
-	private function parse_size_value( $value ) {
+	private function parse_size_value( $value, $property = '' ) {
 		$value = trim( $value );
 		
 		// Handle 'auto' value
@@ -630,10 +779,24 @@ class Atomic_Html_Converter {
 		
 		// Handle numeric values with units
 		preg_match( '/^([\d.]+)(.*)$/', $value, $matches );
+		
+		$size = ! empty( $matches[1] ) ? floatval( $matches[1] ) : 0;
+		$unit = ! empty( $matches[2] ) ? trim( $matches[2] ) : '';
+		
+		// If no unit provided, check if property should be unitless
+		if ( empty( $unit ) ) {
+			// line-height, z-index, opacity, flex-grow, flex-shrink should be unitless
+			$unitless_props = [ 'line-height', 'z-index', 'opacity', 'flex-grow', 'flex-shrink', 'order' ];
+			if ( in_array( $property, $unitless_props, true ) ) {
+				$unit = ''; // Keep empty for unitless
+			} else {
+				$unit = 'px'; // Default to px for other properties
+			}
+		}
 
 		return [
-			'size' => ! empty( $matches[1] ) ? floatval( $matches[1] ) : 0,
-			'unit' => ! empty( $matches[2] ) ? trim( $matches[2] ) : 'px',
+			'size' => $size,
+			'unit' => $unit,
 		];
 	}
 
@@ -781,6 +944,78 @@ class Atomic_Html_Converter {
 			$html .= $node->ownerDocument->saveHTML( $child );
 		}
 		return $html;
+	}
+
+	/**
+	 * Parse CSS gradient to Elementor v4 format
+	 * Supports: linear-gradient(angle, color stop%, color stop%)
+	 * 
+	 * @param string $gradient_string CSS gradient string
+	 * @return array|null Gradient object or null
+	 */
+	private function parse_gradient( $gradient_string ) {
+		// Match linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+		if ( ! preg_match( '/linear-gradient\s*\(\s*([^,]+),\s*(.+)\s*\)/', $gradient_string, $matches ) ) {
+			return null;
+		}
+		
+		$angle_str = trim( $matches[1] );
+		$stops_str = trim( $matches[2] );
+		
+		// Parse angle (135deg → 135)
+		$angle = 0;
+		if ( preg_match( '/(\d+)deg/', $angle_str, $angle_match ) ) {
+			$angle = intval( $angle_match[1] );
+		}
+		
+		// Parse color stops: "#667eea 0%, #764ba2 100%"
+		// Split by comma, but preserve rgba()
+		$stops_parts = preg_split( '/,(?![^(]*\))/', $stops_str );
+		$stops = [];
+		
+		foreach ( $stops_parts as $stop_str ) {
+			$stop_str = trim( $stop_str );
+			
+			// Match: "rgba(0,0,0,1) 0%" or "#667eea 50%" or "white"
+			if ( preg_match( '/^(rgba?\([^)]+\)|#[0-9a-fA-F]{3,8}|\w+)\s*(\d+)?%?\s*$/', $stop_str, $stop_match ) ) {
+				$color = $stop_match[1];
+				$offset = isset( $stop_match[2] ) ? intval( $stop_match[2] ) : ( count( $stops ) === 0 ? 0 : 100 );
+				
+				$stops[] = [
+					'$$type' => 'color-stop',
+					'value'  => [
+						'color' => [
+							'$$type' => 'color',
+							'value'  => $color,
+						],
+						'offset' => [
+							'$$type' => 'number',
+							'value'  => $offset,
+						],
+					],
+				];
+			}
+		}
+		
+		// Need at least 2 stops
+		if ( count( $stops ) < 2 ) {
+			return null;
+		}
+		
+		return [
+			'type' => [
+				'$$type' => 'string',
+				'value'  => 'linear',
+			],
+			'angle' => [
+				'$$type' => 'number',
+				'value'  => $angle,
+			],
+			'stops' => [
+				'$$type' => 'gradient-color-stop',
+				'value'  => $stops,
+			],
+		];
 	}
 
 	/**

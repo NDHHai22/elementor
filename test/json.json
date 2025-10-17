@@ -1,6 +1,6 @@
 [
   {
-    "id": "baf3a77",
+    "id": "b086497",
     "elType": "e-div-block",
     "isInner": false,
     "isLocked": false,
@@ -8,7 +8,7 @@
       "classes": {
         "$$type": "classes",
         "value": [
-          "e-baf3a77-7db1905"
+          "e-b086497-7db1905"
         ]
       }
     },
@@ -17,7 +17,7 @@
     },
     "elements": [
       {
-        "id": "5c0656f",
+        "id": "f4a83e2",
         "elType": "e-div-block",
         "isInner": false,
         "isLocked": false,
@@ -25,7 +25,7 @@
           "classes": {
             "$$type": "classes",
             "value": [
-              "e-5c0656f-9696070"
+              "e-f4a83e2-9696070"
             ]
           }
         },
@@ -34,7 +34,7 @@
         },
         "elements": [
           {
-            "id": "ef537fa",
+            "id": "9320a5d",
             "elType": "widget",
             "isInner": false,
             "isLocked": false,
@@ -46,7 +46,7 @@
               "classes": {
                 "$$type": "classes",
                 "value": [
-                  "e-ef537fa-8f92e3e"
+                  "e-9320a5d-8f92e3e"
                 ]
               }
             },
@@ -61,8 +61,8 @@
               "defaultEditRoute": "content"
             },
             "styles": {
-              "e-ef537fa-8f92e3e": {
-                "id": "e-ef537fa-8f92e3e",
+              "e-9320a5d-8f92e3e": {
+                "id": "e-9320a5d-8f92e3e",
                 "label": "local",
                 "type": "class",
                 "variants": [
@@ -102,7 +102,7 @@
             }
           },
           {
-            "id": "0c06b43",
+            "id": "4d0f46d",
             "elType": "widget",
             "isInner": false,
             "isLocked": false,
@@ -114,7 +114,7 @@
               "classes": {
                 "$$type": "classes",
                 "value": [
-                  "e-0c06b43-a100c7c"
+                  "e-4d0f46d-a100c7c"
                 ]
               }
             },
@@ -129,8 +129,8 @@
               "defaultEditRoute": "content"
             },
             "styles": {
-              "e-0c06b43-a100c7c": {
-                "id": "e-0c06b43-a100c7c",
+              "e-4d0f46d-a100c7c": {
+                "id": "e-4d0f46d-a100c7c",
                 "label": "local",
                 "type": "class",
                 "variants": [
@@ -187,7 +187,7 @@
             }
           },
           {
-            "id": "c1041e4",
+            "id": "921a66e",
             "elType": "widget",
             "isInner": false,
             "isLocked": false,
@@ -199,7 +199,7 @@
               "classes": {
                 "$$type": "classes",
                 "value": [
-                  "e-c1041e4-cad0169"
+                  "e-921a66e-cad0169"
                 ]
               }
             },
@@ -214,8 +214,8 @@
               "defaultEditRoute": "content"
             },
             "styles": {
-              "e-c1041e4-cad0169": {
-                "id": "e-c1041e4-cad0169",
+              "e-921a66e-cad0169": {
+                "id": "e-921a66e-cad0169",
                 "label": "local",
                 "type": "class",
                 "variants": [
@@ -306,8 +306,8 @@
           }
         ],
         "styles": {
-          "e-5c0656f-9696070": {
-            "id": "e-5c0656f-9696070",
+          "e-f4a83e2-9696070": {
+            "id": "e-f4a83e2-9696070",
             "label": "local",
             "type": "class",
             "variants": [
@@ -380,8 +380,8 @@
       }
     ],
     "styles": {
-      "e-baf3a77-7db1905": {
-        "id": "e-baf3a77-7db1905",
+      "e-b086497-7db1905": {
+        "id": "e-b086497-7db1905",
         "label": "local",
         "type": "class",
         "variants": [
@@ -394,6 +394,10 @@
               "background": {
                 "$$type": "background",
                 "value": {
+                  "color": {
+                    "$$type": "color",
+                    "value": "transparent"
+                  },
                   "background-overlay": {
                     "$$type": "background-overlay",
                     "value": [
@@ -421,7 +425,7 @@
                           },
                           "position": {
                             "$$type": "string",
-                            "value": "center"
+                            "value": "center center"
                           },
                           "repeat": {
                             "$$type": "string",

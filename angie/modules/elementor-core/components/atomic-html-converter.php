@@ -499,9 +499,26 @@ class Atomic_Html_Converter {
 		
 		// Merge background-position
 		if ( isset( $css_styles['background-position'] ) ) {
+			$position = $css_styles['background-position'];
+			
+			// Normalize single value to "horizontal vertical" format
+			// "center" → "center center"
+			// "top" → "center top"
+			// "left" → "left center"
+			if ( ! preg_match( '/\s/', $position ) ) {
+				// Single value
+				if ( $position === 'center' ) {
+					$position = 'center center';
+				} elseif ( in_array( $position, [ 'top', 'bottom' ], true ) ) {
+					$position = 'center ' . $position;
+				} elseif ( in_array( $position, [ 'left', 'right' ], true ) ) {
+					$position = $position . ' center';
+				}
+			}
+			
 			$overlay['position'] = [
 				'$$type' => 'string',
-				'value'  => $css_styles['background-position'],
+				'value'  => $position,
 			];
 		}
 		

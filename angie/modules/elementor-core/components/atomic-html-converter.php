@@ -363,6 +363,14 @@ class Atomic_Html_Converter {
 
 		// Background
 		if ( $property === 'background-color' || $property === 'background' ) {
+			// Check if it's a gradient (too complex to parse)
+			if ( strpos( $value, 'gradient' ) !== false ) {
+				error_log( "Gradient background skipped (too complex): $value" );
+				error_log( "Please set gradient manually in Elementor editor" );
+				return null;
+			}
+			
+			// Simple solid color background
 			return [
 				'name'  => 'background',
 				'value' => [
@@ -534,13 +542,61 @@ class Atomic_Html_Converter {
 			];
 		}
 
-		// Box-shadow - complex type (skip for now to avoid validation errors)
+		// Box-shadow - parse basic format: "h-offset v-offset blur spread color"
 		if ( $property === 'box-shadow' && $value !== 'none' ) {
-			// TODO: Implement proper box-shadow parser
-			// Box-shadow is very complex with multiple shadows, inset, etc.
-			// For now, skip it to avoid validation errors
-			error_log( "Box-shadow skipped (complex property): $value" );
-			return null;
+			// Parse: "0 4px 15px rgba(0,0,0,0.2)" or "0 4px 15px 0 rgba(0,0,0,0.2)"
+			// Split by spaces, but keep rgba() together
+			$value = trim( $value );
+			
+			// Extract color (rgba/rgb/hex at end)
+			$color = 'rgba(0, 0, 0, 1)';
+			if ( preg_match( '/(rgba?\([^)]+\)|#[0-9a-fA-F]{3,8})$/', $value, $colorMatch ) ) {
+				$color = $colorMatch[1];
+				$value = trim( str_replace( $colorMatch[0], '', $value ) );
+			}
+			
+			// Parse remaining values (h-offset v-offset blur spread)
+			$parts = preg_split( '/\s+/', $value );
+			
+			if ( count( $parts ) >= 2 ) {
+				return [
+					'name'  => 'box-shadow',
+					'value' => [
+						'$$type' => 'box-shadow',
+						'value'  => [
+							[
+								'$$type' => 'shadow',
+								'value'  => [
+									'hOffset' => [
+										'$$type' => 'size',
+										'value'  => $this->parse_size_value( $parts[0] ),
+									],
+									'vOffset' => [
+										'$$type' => 'size',
+										'value'  => $this->parse_size_value( $parts[1] ),
+									],
+									'blur' => [
+										'$$type' => 'size',
+										'value'  => isset( $parts[2] ) ? $this->parse_size_value( $parts[2] ) : [ 'size' => 0, 'unit' => 'px' ],
+									],
+									'spread' => [
+										'$$type' => 'size',
+										'value'  => isset( $parts[3] ) ? $this->parse_size_value( $parts[3] ) : [ 'size' => 0, 'unit' => 'px' ],
+									],
+									'color' => [
+										'$$type' => 'color',
+										'value'  => $color,
+									],
+									'position' => null,
+								],
+							],
+						],
+					],
+				];
+			} else {
+				error_log( "Box-shadow format not recognized: $value" );
+				return null;
+			}
 		}
 
 		// Transform, transition, filter, backdrop-filter - extremely complex, skip for now
@@ -559,9 +615,20 @@ class Atomic_Html_Converter {
 
 	/**
 	 * Parse size value (e.g., "10px" -> ["size" => 10, "unit" => "px"])
+	 * Supports: px, em, rem, %, vh, vw, auto, etc.
 	 */
 	private function parse_size_value( $value ) {
 		$value = trim( $value );
+		
+		// Handle 'auto' value
+		if ( $value === 'auto' ) {
+			return [
+				'size' => 0,
+				'unit' => 'auto',
+			];
+		}
+		
+		// Handle numeric values with units
 		preg_match( '/^([\d.]+)(.*)$/', $value, $matches );
 
 		return [

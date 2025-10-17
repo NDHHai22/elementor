@@ -151,6 +151,23 @@ class Atomic_Html_Converter {
 		// Check if element has children
 		$children = $this->get_element_children( $node );
 		if ( count( $children ) > 0 ) {
+			// Check if all children are inline formatting elements
+			$inline_tags = [ 'br', 'span', 'em', 'strong', 'b', 'i', 'u', 'mark', 'small', 'sub', 'sup', 'a' ];
+			$all_inline = true;
+			
+			foreach ( $children as $child ) {
+				$child_tag = strtolower( $child->nodeName );
+				if ( ! in_array( $child_tag, $inline_tags, true ) ) {
+					$all_inline = false;
+					break;
+				}
+			}
+			
+			// If all children are inline, treat as text (preserve innerHTML)
+			if ( $all_inline ) {
+				return 'text';
+			}
+			
 			return 'container'; // e-div-block
 		}
 
@@ -550,6 +567,10 @@ class Atomic_Html_Converter {
 						'value' => [
 							'$$type' => 'background',
 							'value'  => [
+								'color' => [
+									'$$type' => 'color',
+									'value'  => 'transparent', // Transparent background, image shows through
+								],
 								'background-overlay' => [
 									'$$type' => 'background-overlay',
 									'value'  => [

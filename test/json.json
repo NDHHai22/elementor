@@ -1,6 +1,6 @@
 [
   {
-    "id": "da694e8",
+    "id": "baf3a77",
     "elType": "e-div-block",
     "isInner": false,
     "isLocked": false,
@@ -8,7 +8,7 @@
       "classes": {
         "$$type": "classes",
         "value": [
-          "e-da694e8-7db1905"
+          "e-baf3a77-7db1905"
         ]
       }
     },
@@ -17,7 +17,7 @@
     },
     "elements": [
       {
-        "id": "ef69d40",
+        "id": "5c0656f",
         "elType": "e-div-block",
         "isInner": false,
         "isLocked": false,
@@ -25,7 +25,7 @@
           "classes": {
             "$$type": "classes",
             "value": [
-              "e-ef69d40-9696070"
+              "e-5c0656f-9696070"
             ]
           }
         },
@@ -34,48 +34,35 @@
         },
         "elements": [
           {
-            "id": "81ba48b",
-            "elType": "e-div-block",
+            "id": "ef537fa",
+            "elType": "widget",
             "isInner": false,
             "isLocked": false,
             "settings": {
+              "paragraph": {
+                "$$type": "string",
+                "value": "\n          Find Your<br>Forever Friend.\n        "
+              },
               "classes": {
                 "$$type": "classes",
                 "value": [
-                  "e-81ba48b-8f92e3e"
+                  "e-ef537fa-8f92e3e"
                 ]
               }
             },
             "defaultEditSettings": {
               "defaultEditRoute": "content"
             },
-            "elements": [
-              {
-                "id": "db71e85",
-                "elType": "widget",
-                "isInner": false,
-                "isLocked": false,
-                "settings": {
-                  "paragraph": {
-                    "$$type": "string",
-                    "value": ""
-                  }
-                },
-                "defaultEditSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "elements": [],
-                "widgetType": "e-paragraph",
-                "htmlCache": "",
-                "editor_settings": [],
-                "editSettings": {
-                  "defaultEditRoute": "content"
-                }
-              }
-            ],
+            "elements": [],
+            "widgetType": "e-paragraph",
+            "htmlCache": "",
+            "editor_settings": [],
+            "editSettings": {
+              "defaultEditRoute": "content"
+            },
             "styles": {
-              "e-81ba48b-8f92e3e": {
-                "id": "e-81ba48b-8f92e3e",
+              "e-ef537fa-8f92e3e": {
+                "id": "e-ef537fa-8f92e3e",
                 "label": "local",
                 "type": "class",
                 "variants": [
@@ -112,15 +99,10 @@
                   }
                 ]
               }
-            },
-            "editor_settings": [],
-            "editSettings": {
-              "defaultEditRoute": "content"
-            },
-            "htmlCache": null
+            }
           },
           {
-            "id": "48eaa6c",
+            "id": "0c06b43",
             "elType": "widget",
             "isInner": false,
             "isLocked": false,
@@ -132,7 +114,7 @@
               "classes": {
                 "$$type": "classes",
                 "value": [
-                  "e-48eaa6c-a100c7c"
+                  "e-0c06b43-a100c7c"
                 ]
               }
             },
@@ -147,8 +129,8 @@
               "defaultEditRoute": "content"
             },
             "styles": {
-              "e-48eaa6c-a100c7c": {
-                "id": "e-48eaa6c-a100c7c",
+              "e-0c06b43-a100c7c": {
+                "id": "e-0c06b43-a100c7c",
                 "label": "local",
                 "type": "class",
                 "variants": [
@@ -205,7 +187,7 @@
             }
           },
           {
-            "id": "5702077",
+            "id": "c1041e4",
             "elType": "widget",
             "isInner": false,
             "isLocked": false,
@@ -217,7 +199,7 @@
               "classes": {
                 "$$type": "classes",
                 "value": [
-                  "e-5702077-cad0169"
+                  "e-c1041e4-cad0169"
                 ]
               }
             },
@@ -232,8 +214,8 @@
               "defaultEditRoute": "content"
             },
             "styles": {
-              "e-5702077-cad0169": {
-                "id": "e-5702077-cad0169",
+              "e-c1041e4-cad0169": {
+                "id": "e-c1041e4-cad0169",
                 "label": "local",
                 "type": "class",
                 "variants": [
@@ -324,8 +306,8 @@
           }
         ],
         "styles": {
-          "e-ef69d40-9696070": {
-            "id": "e-ef69d40-9696070",
+          "e-5c0656f-9696070": {
+            "id": "e-5c0656f-9696070",
             "label": "local",
             "type": "class",
             "variants": [
@@ -398,8 +380,8 @@
       }
     ],
     "styles": {
-      "e-da694e8-7db1905": {
-        "id": "e-da694e8-7db1905",
+      "e-baf3a77-7db1905": {
+        "id": "e-baf3a77-7db1905",
         "label": "local",
         "type": "class",
         "variants": [
@@ -436,6 +418,22 @@
                                 "value": "large"
                               }
                             }
+                          },
+                          "position": {
+                            "$$type": "string",
+                            "value": "center"
+                          },
+                          "repeat": {
+                            "$$type": "string",
+                            "value": "no-repeat"
+                          },
+                          "size": {
+                            "$$type": "string",
+                            "value": "cover"
+                          },
+                          "attachment": {
+                            "$$type": "string",
+                            "value": "scroll"
                           }
                         }
                       }

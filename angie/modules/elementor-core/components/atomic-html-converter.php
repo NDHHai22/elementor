@@ -287,13 +287,57 @@ class Atomic_Html_Converter {
 	private function create_atomic_image( $node, $styles ) {
 		$src = $node->getAttribute( 'src' );
 		$alt = $node->getAttribute( 'alt' );
-		return $this->create_atomic_widget( 'e-image', $node, $styles, [
-			'image' => [
-				'url' => $src,
-				'id'  => '',
-			],
-			'alt' => $alt,
-		] );
+		
+		// Download image from URL and get attachment ID
+		$attachment_id = $this->upload_image_from_url( $src );
+		
+		if ( $attachment_id ) {
+			// Image successfully uploaded
+			$settings = [
+				'image' => [
+					'$$type' => 'image',
+					'value'  => [
+						'src' => [
+							'$$type' => 'image-src',
+							'value'  => [
+								'id' => [
+									'$$type' => 'image-attachment-id',
+									'value'  => $attachment_id,
+								],
+								'url' => null,
+							],
+						],
+					],
+				],
+			];
+		} else {
+			// Fallback: Use external URL if upload fails
+			error_log( "Failed to upload image, using URL: $src" );
+			$settings = [
+				'image' => [
+					'$$type' => 'image',
+					'value'  => [
+						'src' => [
+							'$$type' => 'image-src',
+							'value'  => [
+								'id' => [
+									'$$type' => 'image-attachment-id',
+									'value'  => 0,
+								],
+								'url' => $src,
+							],
+						],
+					],
+				],
+			];
+		}
+		
+		// Add alt text if present
+		if ( ! empty( $alt ) ) {
+			$settings['alt'] = $alt;
+		}
+		
+		return $this->create_atomic_widget( 'e-image', $node, $styles, $settings );
 	}
 
 	/**

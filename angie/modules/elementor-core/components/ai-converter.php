@@ -371,6 +371,7 @@ Giao diện phải có
 - CHỈ trả về mã HTML sạch
 - Bắt đầu trực tiếp với thẻ HTML
 - Tuân thủ TUYỆT ĐỐI quy tắc KHÔNG CSS viết tắt
+- Nếu có ảnh, chỉ được sử dụng images.unsplash.com
 PROMPT;
 	}
 

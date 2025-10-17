@@ -391,23 +391,36 @@ class Atomic_Html_Converter {
 
 	/**
 	 * Group individual padding/margin properties into dimensions
+	 * Auto-fills missing sides with 0
 	 * 
 	 * @param array $props Atomic props array.
 	 * @return array Modified props with grouped dimensions.
 	 */
 	private function group_individual_properties( $props ) {
-		// Check for padding individual properties
+		// Auto-fill missing padding sides with 0
 		$padding_sides = [ 'padding-top', 'padding-right', 'padding-bottom', 'padding-left' ];
-		$has_all_padding = true;
+		$has_any_padding = false;
 		foreach ( $padding_sides as $side ) {
-			if ( ! isset( $props[ $side ] ) ) {
-				$has_all_padding = false;
+			if ( isset( $props[ $side ] ) ) {
+				$has_any_padding = true;
 				break;
 			}
 		}
 
-		// Group padding into dimensions with logical properties
-		if ( $has_all_padding ) {
+		// If we have at least one padding side, fill missing ones with 0
+		if ( $has_any_padding ) {
+			$zero_value = [
+				'$$type' => 'size',
+				'value'  => [ 'size' => 0, 'unit' => 'px' ],
+			];
+
+			foreach ( $padding_sides as $side ) {
+				if ( ! isset( $props[ $side ] ) ) {
+					$props[ $side ] = $zero_value;
+				}
+			}
+
+			// Now group padding into dimensions with logical properties
 			$logical_map = [
 				'padding-top'    => 'block-start',
 				'padding-bottom' => 'block-end',
@@ -418,7 +431,6 @@ class Atomic_Html_Converter {
 			$dimension_values = [];
 			foreach ( $padding_sides as $side ) {
 				$logical_side = $logical_map[ $side ];
-				// Props already have $$type and value structure, just use them directly
 				$dimension_values[ $logical_side ] = $props[ $side ];
 				unset( $props[ $side ] ); // Remove individual property
 			}
@@ -429,18 +441,30 @@ class Atomic_Html_Converter {
 			];
 		}
 
-		// Check for margin individual properties
+		// Auto-fill missing margin sides with 0
 		$margin_sides = [ 'margin-top', 'margin-right', 'margin-bottom', 'margin-left' ];
-		$has_all_margin = true;
+		$has_any_margin = false;
 		foreach ( $margin_sides as $side ) {
-			if ( ! isset( $props[ $side ] ) ) {
-				$has_all_margin = false;
+			if ( isset( $props[ $side ] ) ) {
+				$has_any_margin = true;
 				break;
 			}
 		}
 
-		// Group margin into dimensions with logical properties
-		if ( $has_all_margin ) {
+		// If we have at least one margin side, fill missing ones with 0
+		if ( $has_any_margin ) {
+			$zero_value = [
+				'$$type' => 'size',
+				'value'  => [ 'size' => 0, 'unit' => 'px' ],
+			];
+
+			foreach ( $margin_sides as $side ) {
+				if ( ! isset( $props[ $side ] ) ) {
+					$props[ $side ] = $zero_value;
+				}
+			}
+
+			// Now group margin into dimensions with logical properties
 			$logical_map = [
 				'margin-top'    => 'block-start',
 				'margin-bottom' => 'block-end',
@@ -451,7 +475,6 @@ class Atomic_Html_Converter {
 			$dimension_values = [];
 			foreach ( $margin_sides as $side ) {
 				$logical_side = $logical_map[ $side ];
-				// Props already have $$type and value structure, just use them directly
 				$dimension_values[ $logical_side ] = $props[ $side ];
 				unset( $props[ $side ] ); // Remove individual property
 			}

@@ -104,7 +104,16 @@ class Sidebar_HTML {
 				Loading Angie...
 			</div>
 			
-			<!-- Iframe will be injected here by angie.ts -->
+			<!-- MODIFIED: Inject Next.js iframe directly instead of waiting for angie.ts -->
+			<!-- Original: Iframe will be injected here by angie.ts -->
+			<iframe 
+				id='angie-iframe'
+				src='http://localhost:3030/angie'
+				style='width: 100%; height: 100%; border: none; display: block;'
+				title='Angie AI Assistant'
+				allow='clipboard-read; clipboard-write'
+				sandbox='allow-scripts allow-same-origin allow-forms allow-popups allow-modals'
+			></iframe>
 		</div>
 		";
 

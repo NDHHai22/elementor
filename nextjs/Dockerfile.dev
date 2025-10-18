@@ -1,0 +1,16 @@
+# Use the official Node.js 18 image as base
+FROM node:18-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Install dependencies based on the preferred package manager
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# Rebuild bcrypt for Alpine Linux architecture
+COPY . .
+EXPOSE 3000
+CMD ["npm", "run", "dev"] 

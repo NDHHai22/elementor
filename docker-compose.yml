@@ -45,7 +45,20 @@ services:
       WORDPRESS_DEBUG: 1
     networks:
       - wordpress-network
+  nextjs:
+    build:
+      context: ./nextjs
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./nextjs:/app
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
 
+    ports:
+      - "3030:3000"
+    networks:
+      - wordpress-network
 volumes:
   db_data:
 

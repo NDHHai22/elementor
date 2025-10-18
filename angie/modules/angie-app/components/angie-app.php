@@ -102,6 +102,11 @@ class Angie_App {
 			return;
 		}
 
+		// MODIFIED FOR NEXT.JS INTEGRATION
+		// Commented out CDN script loading - iframe is now injected directly in sidebar-html.php
+		// Original script URL: https://editor-static-bucket.elementor.com/angie.umd.cjs
+		
+		/*
 		// Register and enqueue the external script.
 		wp_enqueue_script(
 			'angie-app',
@@ -109,6 +114,19 @@ class Angie_App {
 			[ 'wp-api-request' ],
 			ANGIE_VERSION,
 			false
+		);
+		*/
+		
+		// NOTE: Iframe is now loaded directly from http://localhost:3000/angie
+		// See: angie/modules/sidebar/components/sidebar-html.php
+		
+		// Load the element detector script
+		wp_enqueue_script(
+			'angie-element-detector',
+			Utils::get_asset_url( 'angie-element-detector.js', __DIR__ ),
+			[], // No dependencies
+			ANGIE_VERSION,
+			true // Load in footer
 		);
 
 		$plugins = apply_filters( 'angie_mcp_plugins', [] );
@@ -167,14 +185,19 @@ class Angie_App {
 
 
 	private function is_oauth_flow_active() {
+		// TEMPORARILY DISABLED FOR TESTING - OAuth flow bypassed
+		// TODO: Re-enable OAuth after Next.js integration testing is complete
+		
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$is_oauth_return = isset( $_GET['oauth_code'] ) || isset( $_GET['oauth_state'] );
+		// $is_oauth_return = isset( $_GET['oauth_code'] ) || isset( $_GET['oauth_state'] );
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$is_oauth_starting = isset( $_GET['start-oauth'] );
+		// $is_oauth_starting = isset( $_GET['start-oauth'] );
+		
+		// Always return false to skip OAuth flow during development
 		return [
-			'is_starting' => $is_oauth_starting,
-			'is_returning' => $is_oauth_return,
-			'is_active' => $is_oauth_starting || $is_oauth_return,
+			'is_starting' => false,
+			'is_returning' => false,
+			'is_active' => false,
 		];
 	}
 

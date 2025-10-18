@@ -38,6 +38,7 @@ class AI_Converter {
 	 * Register REST API routes
 	 */
 	public function register_routes() {
+		// HTML to JSON conversion
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base,
@@ -74,6 +75,27 @@ class AI_Converter {
 				],
 			]
 		);
+
+		// JSON to HTML conversion
+		register_rest_route(
+			$this->namespace,
+			'/json-to-html',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'convert_json_to_html' ],
+				'permission_callback' => [ $this, 'permissions_check' ],
+				'args'                => [
+					'elements' => [
+						'type'              => 'array',
+						'required'          => true,
+						'description'       => 'Elementor JSON elements array',
+						'validate_callback' => function( $value, $request, $key ) {
+							return is_array( $value ) && ! empty( $value );
+						},
+					],
+				],
+			]
+		);
 	}
 
 	/**
@@ -83,6 +105,52 @@ class AI_Converter {
 	 */
 	public function permissions_check() {
 		return current_user_can( 'edit_posts' );
+	}
+
+	/**
+	 * Convert Elementor JSON to HTML
+	 *
+	 * @param \WP_REST_Request $request
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function convert_json_to_html( $request ) {
+		$params = $request->get_json_params() ?: $request->get_body_params();
+		$elements = isset( $params['elements'] ) ? $params['elements'] : [];
+
+		if ( empty( $elements ) || ! is_array( $elements ) ) {
+			return new \WP_Error(
+				'missing_elements',
+				__( 'Elements array is required and must not be empty.', 'angie' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		try {
+			// Use JSON to HTML converter
+			$converter = new Atomic_Json_To_Html();
+			$html = $converter->convert( $elements );
+
+			if ( empty( $html ) ) {
+				return new \WP_Error(
+					'conversion_failed',
+					__( 'Failed to convert JSON to HTML.', 'angie' ),
+					[ 'status' => 500 ]
+				);
+			}
+
+			return rest_ensure_response( [
+				'success' => true,
+				'html'    => $html,
+				'message' => __( 'JSON successfully converted to HTML.', 'angie' ),
+			] );
+
+		} catch ( \Exception $e ) {
+			return new \WP_Error(
+				'conversion_error',
+				sprintf( __( 'JSON to HTML conversion failed: %s', 'angie' ), $e->getMessage() ),
+				[ 'status' => 500 ]
+			);
+		}
 	}
 
 	/**

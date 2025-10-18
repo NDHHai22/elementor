@@ -43,6 +43,9 @@
                             <button class="angie-tab" data-tab="html">
                                 <i class="eicon-code"></i> Convert HTML
                             </button>
+                            <button class="angie-tab" data-tab="json">
+                                <i class="eicon-download"></i> JSON to HTML
+                            </button>
                         </div>
 
                         <!-- AI Generate Tab -->
@@ -104,6 +107,23 @@
                                 <button id="angie-convert-html-btn" class="angie-btn angie-btn-primary">
                                     <i class="eicon-sync"></i>
                                     Convert to Elementor
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- JSON to HTML Tab -->
+                        <div id="angie-tab-json" class="angie-tab-content" style="display: none;">
+                            <div class="angie-form-group">
+                                <label>
+                                    <strong>Select an element to convert:</strong>
+                                </label>
+                                <p class="angie-small-text">Choose an element from the panel on the left to convert its JSON to HTML</p>
+                            </div>
+
+                            <div class="angie-button-group">
+                                <button id="angie-json-to-html-btn" class="angie-btn angie-btn-primary">
+                                    <i class="eicon-download"></i>
+                                    Get HTML from Selected
                                 </button>
                             </div>
                         </div>
@@ -284,6 +304,11 @@
             }
 
             convertHTMLOnly(html);
+        });
+
+        // Convert JSON to HTML button
+        $('#angie-json-to-html-btn').on('click', function() {
+            convertJSONToHTML();
         });
 
         // Insert button
@@ -554,6 +579,127 @@
      */
     function generateRandomId() {
         return Math.random().toString(36).substr(2, 7);
+    }
+
+    /**
+     * Convert selected element JSON to HTML
+     */
+    function convertJSONToHTML() {
+        // Get selected element from Elementor
+        if (typeof elementor === 'undefined') {
+            showStatus('❌ Elementor not available!', 'error');
+            return;
+        }
+
+        const selection = elementor.selection.getElements();
+        
+        if (!selection || selection.length === 0) {
+            showStatus('❌ Please select an element to convert!', 'error');
+            return;
+        }
+
+        const element = selection[0];
+        const model = element.model;
+
+        // Get element data - handle both single element and container with children
+        const elements = [];
+        
+        if (model.get('elType') === 'container' || model.get('elType') === 'e-div-block') {
+            // If it's a container, get all children
+            const children = model.get('elements');
+            if (children && children.length > 0) {
+                elements.push(...children.toJSON());
+            } else {
+                // Empty container
+                elements.push(model.toJSON());
+            }
+        } else {
+            // Single element
+            elements.push(model.toJSON());
+        }
+
+        if (elements.length === 0) {
+            showStatus('❌ Element has no content to convert!', 'error');
+            return;
+        }
+
+        const $btn = $('#angie-json-to-html-btn');
+        const originalHtml = $btn.html();
+
+        $btn.prop('disabled', true).html('<i class="eicon-loading eicon-animation-spin"></i> Converting...');
+        showStatus('🔄 Converting JSON to HTML...', 'info');
+
+        $.ajax({
+            url: wpApiSettings.root + 'angie/v1/json-to-html',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                elements: elements
+            }),
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-WP-Nonce', wpApiSettings.nonce);
+            },
+            success: function(response) {
+                if (response.success && response.html) {
+                    showStatus('✅ Success! Element converted to HTML', 'success');
+                    displayHTMLResult(response.html);
+                } else {
+                    showStatus('❌ Conversion failed: Invalid response', 'error');
+                    console.error('Response:', response);
+                }
+            },
+            error: function(xhr) {
+                let errorMsg = '❌ Conversion failed';
+                
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg += ': ' + xhr.responseJSON.message;
+                }
+
+                showStatus(errorMsg, 'error');
+                console.error('Conversion Error:', xhr);
+            },
+            complete: function() {
+                $btn.prop('disabled', false).html(originalHtml);
+            }
+        });
+    }
+
+    /**
+     * Display HTML conversion result
+     */
+    function displayHTMLResult(html) {
+        const escapedHtml = $('<div>').text(html).html();
+
+        const outputHtml = `
+            <div class="angie-output-success">
+                <div class="angie-output-header">
+                    <i class="eicon-check-circle"></i>
+                    <strong>✓ HTML Conversion Complete</strong>
+                </div>
+
+                <div class="angie-html-preview">
+                    <div class="angie-preview-header">
+                        <strong>📝 Generated HTML</strong>
+                        <button class="angie-copy-result-btn" title="Copy HTML to clipboard">
+                            <i class="eicon-copy"></i> Copy
+                        </button>
+                    </div>
+                    <pre class="angie-code-output">${escapedHtml}</pre>
+                </div>
+            </div>
+        `;
+
+        $('#angie-output').html(outputHtml);
+
+        // Store for copy functionality
+        window.angieConvertedData = {
+            html: html
+        };
+
+        // Copy button event
+        $('.angie-copy-result-btn').on('click', function() {
+            copyToClipboard(html, 'HTML');
+        });
     }
 
     /**
@@ -831,6 +977,40 @@
                 });
             }, 3000);
         }
+    }
+
+    /**
+     * Copy text to clipboard
+     */
+    function copyToClipboard(text, label = 'Text') {
+        // Try modern Clipboard API first
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(function() {
+                showStatus(`✅ ${label} copied to clipboard!`, 'success');
+            }).catch(function() {
+                // Fallback to old method
+                fallbackCopy(text, label);
+            });
+        } else {
+            // Use fallback method
+            fallbackCopy(text, label);
+        }
+    }
+
+    /**
+     * Fallback copy method
+     */
+    function fallbackCopy(text, label = 'Text') {
+        const $temp = $('<textarea>').val(text).appendTo('body').select();
+        
+        try {
+            document.execCommand('copy');
+            showStatus(`✅ ${label} copied to clipboard!`, 'success');
+        } catch (err) {
+            showStatus(`❌ Failed to copy ${label}`, 'error');
+        }
+        
+        $temp.remove();
     }
 
     /**

@@ -12,6 +12,7 @@ use Angie\Plugin;
 use Angie\Modules\ElementorCore\Components\Kit_Provider;
 use Angie\Modules\ElementorCore\Components\Widget_Manager;
 use Angie\Modules\ElementorCore\Components\Html_To_Elementor_Converter;
+use Angie\Modules\ElementorCore\Components\Json_To_Html_Converter;
 use Angie\Modules\ElementorCore\Components\AI_Settings;
 use Angie\Modules\ElementorCore\Components\AI_Converter;
 use Angie\Modules\ElementorCore\Components\AI_Settings_Page;
@@ -47,6 +48,13 @@ class Module extends Module_Base {
 	 * @var \Angie\Modules\ElementorCore\Components\Html_To_Elementor_Converter
 	 */
 	public $html_converter;
+
+	/**
+	 * JSON to HTML Converter
+	 *
+	 * @var \Angie\Modules\ElementorCore\Components\Json_To_Html_Converter
+	 */
+	public $json_to_html_converter;
 
 	/**
 	 * AI Settings controller
@@ -93,6 +101,7 @@ class Module extends Module_Base {
 		$this->kit_provider = new Kit_Provider();
 		$this->widget_manager = new Widget_Manager();
 		$this->html_converter = new Html_To_Elementor_Converter();
+		$this->json_to_html_converter = new Json_To_Html_Converter();
 		$this->ai_settings = new AI_Settings();
 		$this->ai_converter = new AI_Converter();
 		$this->ai_settings_page = new AI_Settings_Page();

@@ -258,9 +258,18 @@ class Atomic_Html_Converter {
 			$settings['link'] = [
 				'$$type' => 'link',
 				'value'  => [
-					'url'         => $href,
-					'is_external' => '',
-					'nofollow'    => '',
+					'destination' => [
+						'$$type' => 'url',
+						'value'  => $href,
+					],
+					'label' => [
+						'$$type' => 'string',
+						'value'  => '',
+					],
+					'isTargetBlank' => [
+						'$$type' => 'boolean',
+						'value'  => false,
+					],
 				],
 			];
 		}

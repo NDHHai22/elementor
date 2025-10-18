@@ -1,601 +1,42 @@
 [
   {
-    "id": "8338fbb",
-    "elType": "e-div-block",
+    "id": "c02dbc3",
+    "elType": "widget",
     "isInner": false,
     "isLocked": false,
     "settings": {
+      "text": {
+        "$$type": "string",
+        "value": "Đón Bé Về"
+      },
+      "link": {
+        "$$type": "link",
+        "value": {
+          "url": "#",
+          "is_external": "",
+          "nofollow": ""
+        }
+      },
       "classes": {
         "$$type": "classes",
         "value": [
-          "e-8338fbb-8ecba01"
+          "e-c02dbc3-f1597c4"
         ]
       }
     },
     "defaultEditSettings": {
       "defaultEditRoute": "content"
     },
-    "elements": [
-      {
-        "id": "38a366f",
-        "elType": "widget",
-        "isInner": false,
-        "isLocked": false,
-        "settings": {
-          "image": {
-            "url": "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?q=80&w=1780&auto=format&fit=crop",
-            "id": ""
-          },
-          "alt": "Mèo Mướp",
-          "classes": {
-            "$$type": "classes",
-            "value": [
-              "e-38a366f-befc53d"
-            ]
-          }
-        },
-        "defaultEditSettings": {
-          "defaultEditRoute": "content"
-        },
-        "elements": [],
-        "widgetType": "e-image",
-        "htmlCache": "",
-        "editor_settings": [],
-        "editSettings": {
-          "defaultEditRoute": "content"
-        },
-        "styles": {
-          "e-38a366f-befc53d": {
-            "id": "e-38a366f-befc53d",
-            "label": "local",
-            "type": "class",
-            "variants": [
-              {
-                "meta": {
-                  "breakpoint": "desktop",
-                  "state": null
-                },
-                "props": {
-                  "width": {
-                    "$$type": "size",
-                    "value": {
-                      "size": 100,
-                      "unit": "%"
-                    }
-                  },
-                  "height": {
-                    "$$type": "size",
-                    "value": {
-                      "size": 200,
-                      "unit": "px"
-                    }
-                  },
-                  "display": {
-                    "$$type": "string",
-                    "value": "block"
-                  }
-                },
-                "custom_css": null
-              }
-            ]
-          }
-        }
-      },
-      {
-        "id": "3955a7c",
-        "elType": "e-div-block",
-        "isInner": false,
-        "isLocked": false,
-        "settings": {
-          "classes": {
-            "$$type": "classes",
-            "value": [
-              "e-3955a7c-0d20f29"
-            ]
-          }
-        },
-        "defaultEditSettings": {
-          "defaultEditRoute": "content"
-        },
-        "elements": [
-          {
-            "id": "985035b",
-            "elType": "e-div-block",
-            "isInner": false,
-            "isLocked": false,
-            "settings": {
-              "classes": {
-                "$$type": "classes",
-                "value": [
-                  "e-985035b-94952a3"
-                ]
-              }
-            },
-            "defaultEditSettings": {
-              "defaultEditRoute": "content"
-            },
-            "elements": [
-              {
-                "id": "1e7e2c9",
-                "elType": "widget",
-                "isInner": false,
-                "isLocked": false,
-                "settings": {
-                  "paragraph": {
-                    "$$type": "string",
-                    "value": "Milo"
-                  },
-                  "classes": {
-                    "$$type": "classes",
-                    "value": [
-                      "e-1e7e2c9-02c3d0c"
-                    ]
-                  }
-                },
-                "defaultEditSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "elements": [],
-                "widgetType": "e-paragraph",
-                "htmlCache": "",
-                "editor_settings": [],
-                "editSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "styles": {
-                  "e-1e7e2c9-02c3d0c": {
-                    "id": "e-1e7e2c9-02c3d0c",
-                    "label": "local",
-                    "type": "class",
-                    "variants": [
-                      {
-                        "meta": {
-                          "breakpoint": "desktop",
-                          "state": null
-                        },
-                        "props": {
-                          "font-size": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 22,
-                              "unit": "px"
-                            }
-                          },
-                          "font-weight": {
-                            "$$type": "string",
-                            "value": "700"
-                          },
-                          "color": {
-                            "$$type": "color",
-                            "value": "#5c4b3f"
-                          }
-                        },
-                        "custom_css": null
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                "id": "1579ad9",
-                "elType": "widget",
-                "isInner": false,
-                "isLocked": false,
-                "settings": {
-                  "paragraph": {
-                    "$$type": "string",
-                    "value": "3 tháng tuổi"
-                  },
-                  "classes": {
-                    "$$type": "classes",
-                    "value": [
-                      "e-1579ad9-448db19"
-                    ]
-                  }
-                },
-                "defaultEditSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "elements": [],
-                "widgetType": "e-paragraph",
-                "htmlCache": "",
-                "editor_settings": [],
-                "editSettings": {
-                  "defaultEditRoute": "content"
-                },
-                "styles": {
-                  "e-1579ad9-448db19": {
-                    "id": "e-1579ad9-448db19",
-                    "label": "local",
-                    "type": "class",
-                    "variants": [
-                      {
-                        "meta": {
-                          "breakpoint": "desktop",
-                          "state": null
-                        },
-                        "props": {
-                          "font-size": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 14,
-                              "unit": "px"
-                            }
-                          },
-                          "color": {
-                            "$$type": "color",
-                            "value": "#7a6a5d"
-                          },
-                          "background": {
-                            "$$type": "background",
-                            "value": {
-                              "color": {
-                                "$$type": "color",
-                                "value": "#e5e5e5"
-                              }
-                            }
-                          },
-                          "border-radius": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 12,
-                              "unit": "px"
-                            }
-                          },
-                          "padding": {
-                            "$$type": "dimensions",
-                            "value": {
-                              "block-start": {
-                                "$$type": "size",
-                                "value": {
-                                  "size": 4,
-                                  "unit": "px"
-                                }
-                              },
-                              "inline-end": {
-                                "$$type": "size",
-                                "value": {
-                                  "size": 10,
-                                  "unit": "px"
-                                }
-                              },
-                              "block-end": {
-                                "$$type": "size",
-                                "value": {
-                                  "size": 4,
-                                  "unit": "px"
-                                }
-                              },
-                              "inline-start": {
-                                "$$type": "size",
-                                "value": {
-                                  "size": 10,
-                                  "unit": "px"
-                                }
-                              }
-                            }
-                          }
-                        },
-                        "custom_css": null
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
-            "styles": {
-              "e-985035b-94952a3": {
-                "id": "e-985035b-94952a3",
-                "label": "local",
-                "type": "class",
-                "variants": [
-                  {
-                    "meta": {
-                      "breakpoint": "desktop",
-                      "state": null
-                    },
-                    "props": {
-                      "display": {
-                        "$$type": "string",
-                        "value": "flex"
-                      },
-                      "justify-content": {
-                        "$$type": "string",
-                        "value": "space-between"
-                      },
-                      "align-items": {
-                        "$$type": "string",
-                        "value": "center"
-                      }
-                    },
-                    "custom_css": null
-                  }
-                ]
-              }
-            },
-            "editor_settings": [],
-            "editSettings": {
-              "defaultEditRoute": "content"
-            },
-            "htmlCache": null
-          },
-          {
-            "id": "35743c5",
-            "elType": "widget",
-            "isInner": false,
-            "isLocked": false,
-            "settings": {
-              "paragraph": {
-                "$$type": "string",
-                "value": "Mèo Mướp Vàng"
-              },
-              "classes": {
-                "$$type": "classes",
-                "value": [
-                  "e-35743c5-7355c7c"
-                ]
-              }
-            },
-            "defaultEditSettings": {
-              "defaultEditRoute": "content"
-            },
-            "elements": [],
-            "widgetType": "e-paragraph",
-            "htmlCache": "",
-            "editor_settings": [],
-            "editSettings": {
-              "defaultEditRoute": "content"
-            },
-            "styles": {
-              "e-35743c5-7355c7c": {
-                "id": "e-35743c5-7355c7c",
-                "label": "local",
-                "type": "class",
-                "variants": [
-                  {
-                    "meta": {
-                      "breakpoint": "desktop",
-                      "state": null
-                    },
-                    "props": {
-                      "font-size": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 16,
-                          "unit": "px"
-                        }
-                      },
-                      "color": {
-                        "$$type": "color",
-                        "value": "#9c8b7e"
-                      },
-                      "margin": {
-                        "$$type": "dimensions",
-                        "value": {
-                          "block-start": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 4,
-                              "unit": "px"
-                            }
-                          },
-                          "inline-end": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 0,
-                              "unit": "px"
-                            }
-                          },
-                          "block-end": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 16,
-                              "unit": "px"
-                            }
-                          },
-                          "inline-start": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 0,
-                              "unit": "px"
-                            }
-                          }
-                        }
-                      }
-                    },
-                    "custom_css": null
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "id": "e94a6bc",
-            "elType": "widget",
-            "isInner": false,
-            "isLocked": false,
-            "settings": {
-              "text": {
-                "$$type": "string",
-                "value": "Đón Bé Về"
-              },
-              "classes": {
-                "$$type": "classes",
-                "value": [
-                  "e-e94a6bc-f1597c4"
-                ]
-              }
-            },
-            "defaultEditSettings": {
-              "defaultEditRoute": "content"
-            },
-            "elements": [],
-            "widgetType": "e-button",
-            "htmlCache": "",
-            "editor_settings": [],
-            "editSettings": {
-              "defaultEditRoute": "content"
-            },
-            "styles": {
-              "e-e94a6bc-f1597c4": {
-                "id": "e-e94a6bc-f1597c4",
-                "label": "local",
-                "type": "class",
-                "variants": [
-                  {
-                    "meta": {
-                      "breakpoint": "desktop",
-                      "state": null
-                    },
-                    "props": {
-                      "width": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 100,
-                          "unit": "%"
-                        }
-                      },
-                      "background": {
-                        "$$type": "background",
-                        "value": {
-                          "color": {
-                            "$$type": "color",
-                            "value": "#ff9b85"
-                          }
-                        }
-                      },
-                      "color": {
-                        "$$type": "color",
-                        "value": "#ffffff"
-                      },
-                      "border-style": {
-                        "$$type": "string",
-                        "value": "none"
-                      },
-                      "border-radius": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 8,
-                          "unit": "px"
-                        }
-                      },
-                      "font-size": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 16,
-                          "unit": "px"
-                        }
-                      },
-                      "font-weight": {
-                        "$$type": "string",
-                        "value": "bold"
-                      },
-                      "cursor": {
-                        "$$type": "string",
-                        "value": "pointer"
-                      },
-                      "padding": {
-                        "$$type": "dimensions",
-                        "value": {
-                          "block-start": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 12,
-                              "unit": "px"
-                            }
-                          },
-                          "inline-end": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 24,
-                              "unit": "px"
-                            }
-                          },
-                          "block-end": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 12,
-                              "unit": "px"
-                            }
-                          },
-                          "inline-start": {
-                            "$$type": "size",
-                            "value": {
-                              "size": 24,
-                              "unit": "px"
-                            }
-                          }
-                        }
-                      }
-                    },
-                    "custom_css": null
-                  }
-                ]
-              }
-            }
-          }
-        ],
-        "styles": {
-          "e-3955a7c-0d20f29": {
-            "id": "e-3955a7c-0d20f29",
-            "label": "local",
-            "type": "class",
-            "variants": [
-              {
-                "meta": {
-                  "breakpoint": "desktop",
-                  "state": null
-                },
-                "props": {
-                  "padding": {
-                    "$$type": "dimensions",
-                    "value": {
-                      "block-start": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 20,
-                          "unit": "px"
-                        }
-                      },
-                      "inline-end": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 20,
-                          "unit": "px"
-                        }
-                      },
-                      "block-end": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 20,
-                          "unit": "px"
-                        }
-                      },
-                      "inline-start": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 20,
-                          "unit": "px"
-                        }
-                      }
-                    }
-                  }
-                },
-                "custom_css": null
-              }
-            ]
-          }
-        },
-        "editor_settings": [],
-        "editSettings": {
-          "defaultEditRoute": "content"
-        },
-        "htmlCache": null
-      }
-    ],
+    "elements": [],
+    "widgetType": "e-button",
+    "htmlCache": "",
+    "editor_settings": [],
+    "editSettings": {
+      "defaultEditRoute": "content"
+    },
     "styles": {
-      "e-8338fbb-8ecba01": {
-        "id": "e-8338fbb-8ecba01",
+      "e-c02dbc3-f1597c4": {
+        "id": "e-c02dbc3-f1597c4",
         "label": "local",
         "type": "class",
         "variants": [
@@ -608,8 +49,8 @@
               "width": {
                 "$$type": "size",
                 "value": {
-                  "size": 300,
-                  "unit": "px"
+                  "size": 100,
+                  "unit": "%"
                 }
               },
               "background": {
@@ -617,92 +58,68 @@
                 "value": {
                   "color": {
                     "$$type": "color",
-                    "value": "#ffffff"
+                    "value": "#ff9b85"
                   }
                 }
               },
+              "color": {
+                "$$type": "color",
+                "value": "#ffffff"
+              },
+              "border-style": {
+                "$$type": "string",
+                "value": "none"
+              },
               "border-radius": {
+                "$$type": "size",
+                "value": {
+                  "size": 8,
+                  "unit": "px"
+                }
+              },
+              "font-size": {
                 "$$type": "size",
                 "value": {
                   "size": 16,
                   "unit": "px"
                 }
               },
-              "overflow": {
+              "font-weight": {
                 "$$type": "string",
-                "value": "hidden"
+                "value": "bold"
               },
-              "box-shadow": {
-                "$$type": "box-shadow",
-                "value": [
-                  {
-                    "$$type": "shadow",
-                    "value": {
-                      "hOffset": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 0,
-                          "unit": "px"
-                        }
-                      },
-                      "vOffset": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 8,
-                          "unit": "px"
-                        }
-                      },
-                      "blur": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 24,
-                          "unit": "px"
-                        }
-                      },
-                      "spread": {
-                        "$$type": "size",
-                        "value": {
-                          "size": 0,
-                          "unit": "px"
-                        }
-                      },
-                      "color": {
-                        "$$type": "color",
-                        "value": "rgba(92, 75, 63, 0.1)"
-                      },
-                      "position": null
-                    }
-                  }
-                ]
+              "cursor": {
+                "$$type": "string",
+                "value": "pointer"
               },
-              "margin": {
+              "padding": {
                 "$$type": "dimensions",
                 "value": {
                   "block-start": {
                     "$$type": "size",
                     "value": {
-                      "size": 16,
+                      "size": 12,
                       "unit": "px"
                     }
                   },
                   "inline-end": {
                     "$$type": "size",
                     "value": {
-                      "size": 16,
+                      "size": 24,
                       "unit": "px"
                     }
                   },
                   "block-end": {
                     "$$type": "size",
                     "value": {
-                      "size": 16,
+                      "size": 12,
                       "unit": "px"
                     }
                   },
                   "inline-start": {
                     "$$type": "size",
                     "value": {
-                      "size": 16,
+                      "size": 24,
                       "unit": "px"
                     }
                   }
@@ -713,11 +130,6 @@
           }
         ]
       }
-    },
-    "editor_settings": [],
-    "editSettings": {
-      "defaultEditRoute": "content"
-    },
-    "htmlCache": null
+    }
   }
 ]

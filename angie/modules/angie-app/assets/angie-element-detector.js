@@ -53,6 +53,10 @@
                 sendSelectedElement();
                 break;
 
+            case 'INSERT_ELEMENTOR_ELEMENTS':
+                handleInsertElements(event.data.payload);
+                break;
+
             case 'ANGIE_HEARTBEAT':
                 // Optional: respond to heartbeat
                 break;
@@ -280,6 +284,224 @@
         isElementorEditor,
         sendElementorContext,
         sendSelectedElement,
+        handleInsertElements, // Expose for testing
     };
+
+    // ============================================================================
+    // INSERT ELEMENTS HANDLER
+    // ============================================================================
+
+    /**
+     * Handle insert elements request from iframe
+     * @param {Array} elements - Array of Elementor elements to insert
+     */
+    function handleInsertElements(elements) {
+        console.log('🚀 Insert elements request received:', elements);
+
+        if (!elements || !Array.isArray(elements)) {
+            console.error('Invalid elements payload:', elements);
+            sendInsertResponse(false, 'Invalid elements format');
+            return;
+        }
+
+        if (!isElementorEditor()) {
+            console.error('Not in Elementor editor');
+            sendInsertResponse(false, 'Not in Elementor editor. Please open Elementor to insert elements.');
+            return;
+        }
+
+        try {
+            insertElementsToElementor(elements);
+            sendInsertResponse(true, `Successfully inserted ${elements.length} element(s)`);
+        } catch (error) {
+            console.error('Error inserting elements:', error);
+            sendInsertResponse(false, error.message || 'Failed to insert elements');
+        }
+    }
+
+    /**
+     * Send insert response back to iframe
+     * @param {boolean} success - Whether insert was successful
+     * @param {string} message - Status message
+     */
+    function sendInsertResponse(success, message) {
+        if (!iframe || !iframe.contentWindow) return;
+
+        iframe.contentWindow.postMessage({
+            type: 'INSERT_ELEMENTS_RESPONSE',
+            payload: {
+                success: success,
+                message: message,
+            },
+            timestamp: Date.now(),
+        }, '*');
+
+        console.log('Sent insert response:', { success, message });
+    }
+
+    /**
+     * Insert elements into Elementor editor
+     * @param {Array} elements - Elementor elements to insert
+     */
+    function insertElementsToElementor(elements) {
+        const elementor = window.elementor;
+
+        if (!elementor) {
+            throw new Error('Elementor not available');
+        }
+
+        console.log('🎨 Inserting into Elementor...', elements);
+
+        // Get target container
+        let targetContainer = getTargetContainer();
+        
+        if (!targetContainer) {
+            throw new Error('No target container found. Please select a container or section.');
+        }
+
+        console.log('📦 Target container:', {
+            id: targetContainer.id,
+            type: targetContainer.type,
+            label: targetContainer.label,
+        });
+
+        // Insert each element
+        elements.forEach((elementData, index) => {
+            try {
+                insertSingleElement(targetContainer, elementData, index);
+            } catch (error) {
+                console.error(`Failed to insert element ${index}:`, error);
+                throw error;
+            }
+        });
+
+        console.log('✅ All elements inserted successfully');
+
+        // Trigger Elementor history save
+        if (elementor.history && elementor.history.history) {
+            elementor.history.history.startItem({
+                title: 'Insert from Angie',
+                type: 'add',
+            });
+            elementor.history.history.endItem();
+        }
+    }
+
+    /**
+     * Get target container for insertion
+     * @returns {Object|null} Target container info
+     */
+    function getTargetContainer() {
+        const elementor = window.elementor;
+
+        // Try 1: Get selected container
+        if (elementor.selection) {
+            const elements = elementor.selection.getElements();
+            if (elements && elements.length > 0) {
+                const element = elements[0];
+                const model = element.model;
+                const elType = model.get('elType');
+
+                // Only allow container types (section, column, container, e-div-block)
+                const containerTypes = ['section', 'column', 'container', 'e-div-block'];
+                
+                if (containerTypes.includes(elType)) {
+                    return {
+                        model: model,
+                        view: element,
+                        id: model.get('id'),
+                        type: elType,
+                        label: getElementLabel(element),
+                    };
+                }
+            }
+        }
+
+        // Try 2: Get document root
+        try {
+            const previewView = elementor.getPreviewView();
+            if (previewView) {
+                return {
+                    model: previewView.model,
+                    view: previewView,
+                    id: previewView.model.get('id'),
+                    type: 'document',
+                    label: 'Document Root',
+                };
+            }
+        } catch (e) {
+            console.warn('Could not get preview view:', e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get human-readable label for element
+     */
+    function getElementLabel(element) {
+        const model = element.model;
+        const elType = model.get('elType');
+        const id = model.get('id');
+        
+        let label = elType.charAt(0).toUpperCase() + elType.slice(1);
+        
+        if (elType === 'widget') {
+            const widgetType = model.get('widgetType');
+            label = widgetType ? widgetType.replace(/-/g, ' ') : 'Widget';
+            label = label.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        }
+
+        return `${label} #${id.substring(0, 6)}`;
+    }
+
+    /**
+     * Insert single element into container
+     * @param {Object} targetContainer - Target container
+     * @param {Object} elementData - Element data
+     * @param {number} index - Element index
+     */
+    function insertSingleElement(targetContainer, elementData, index) {
+        const elementor = window.elementor;
+
+        console.log(`📝 Inserting element ${index + 1}:`, {
+            id: elementData.id,
+            type: elementData.elType,
+            widgetType: elementData.widgetType,
+        });
+
+        // Use Elementor's internal API to create element
+        try {
+            // Method 1: Use $e.run command (preferred for v3.6+)
+            if (window.$e && $e.run) {
+                const options = {
+                    container: targetContainer.model,
+                    model: elementData,
+                    options: {
+                        at: index, // Insert position
+                        edit: false, // Don't auto-open panel
+                    },
+                };
+
+                $e.run('document/elements/create', options);
+                console.log('✅ Element created via $e.run');
+                return;
+            }
+
+            // Method 2: Direct model creation (fallback)
+            if (targetContainer.model && targetContainer.model.get('elements')) {
+                const collection = targetContainer.model.get('elements');
+                collection.add(elementData, { at: index });
+                console.log('✅ Element created via model.add');
+                return;
+            }
+
+            throw new Error('No suitable insertion method found');
+
+        } catch (error) {
+            console.error('Error in insertSingleElement:', error);
+            throw error;
+        }
+    }
 
 })();

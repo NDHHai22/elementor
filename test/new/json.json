@@ -1448,7 +1448,7 @@
                                     "value": "pointer"
                                   }
                                 },
-                                "custom_css": null
+                                "custom_css": "selector a {\n    background: red !important; \n}"
                               }
                             ]
                           }

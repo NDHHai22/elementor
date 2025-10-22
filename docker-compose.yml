@@ -31,6 +31,8 @@ services:
     volumes:
       # developing plugin / theme
       - ./angie:/var/www/html/wp-content/plugins/angie
+      - ./ThemeRex-plugin/trx_addons:/var/www/html/wp-content/plugins/trx_addons
+      - ./ThemeRex-TaxHelp-theme:/var/www/html/wp-content/themes/ThemeRex-TaxHelp-theme
       # Custom PHP configuration - use uploads.ini for PHP-FPM
       - ./custom-php.ini:/usr/local/etc/php/conf.d/uploads.ini
       # Custom WordPress debug configuration

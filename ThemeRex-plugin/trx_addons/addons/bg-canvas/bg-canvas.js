@@ -56,14 +56,16 @@
 							color: color_start,
 							effect: effect_start,
 							size: $start.data('bg-canvas-size') ? $start.data('bg-canvas-size') : 0,
-							shift: $start.data('bg-canvas-shift') ? $start.data('bg-canvas-shift') : 0
+							shift: $start.data('bg-canvas-shift') ? $start.data('bg-canvas-shift') : 0,
+							speed: $start.data('bg-canvas-speed') ? $start.data('bg-canvas-speed') : 0
 							},
 					end: {
 							obj: $end,
 							color: color_end,
 							effect: effect_end,
 							size: $end.data('bg-canvas-size') ? $end.data('bg-canvas-size') : 0,
-							shift: $end.data('bg-canvas-shift') ? $end.data('bg-canvas-shift') : 0
+							shift: $end.data('bg-canvas-shift') ? $end.data('bg-canvas-shift') : 0,
+							speed: $end.data('bg-canvas-speed') ? $end.data('bg-canvas-speed') : 0
 						}
 				} );
 
@@ -191,13 +193,22 @@
 			
 			var wst = trx_addons_window_scroll_top(),
 				wh  = trx_addons_window_height(),
-				t  = item.start.top - wst,
+				// Tính khoảng cách từ start đến end
+				startPoint = item.start.top + (wh * item.start.shift / 100),
+				endPoint = item.end.top + item.end.h - wh + (wh * item.end.shift / 100),
+				totalDistance = endPoint - startPoint,
+				currentDistance = wst - startPoint;
+			
+			// Tính progress từ 0 (start) đến 1 (end)
+			item.progress = totalDistance > 0 ? Math.max(0, Math.min(1, currentDistance / totalDistance)) : 0;
+			
+			// Tính distance cho color transition
+			var t  = item.start.top - wst,
 				dt = wh * item.start.shift / 100,
 				rt = 1 - Math.max( 0, Math.min( 1, ( t + dt ) / wh ) ),
 				b  = item.end.top + item.end.h - wst - wh,
 				db = wh * item.end.shift / 100,
 				rb = Math.max( 0, Math.min( 1, ( b + db ) / wh ) );
-			item.progress = Math.min(rt, rb);
 			item.distance = rt == 1 && rb == 1 ? -t / ( -t - dt + b + db - wh ) : 0;
 			item.coords = item.end.top - wst + db < wh * 1.5 || rb < 1
 							? {
@@ -247,18 +258,42 @@
 					item.canvas.ctx.closePath();
 					item.canvas.ctx.fill();
 				} else if ( effect == 'fade' ) {
+
+					console.log(item.start.speed);
 					if ( item.effect != effect || item.start.color != item.end.color ) {
 						item.canvas.obj.css( {
-							'background-color': color
+							'background-color': color,
+							'transition': `opacity ${item.start.speed}ms ease`
 						} );
 					}
 					if ( item.effect != effect ) {
 						item.effect = effect;
 						jQuery( item.canvas.cnv ).hide();
 					}
-					item.canvas.obj.css( {
-						'opacity': item.progress
-					} );
+					if(item.progress > 0 && item.progress < 1){
+						item.canvas.obj.css( {
+							'opacity': 1
+						} );						
+					}
+					else{
+						item.canvas.obj.css( {
+							'opacity': 0
+						} );
+					}
+					if(item.progress > 0.5){
+						if(item.end.speed > 0){
+							item.canvas.obj.css( {
+								'transition': `opacity ${item.end.speed}ms`
+							} );	
+						}
+					}else{
+						if(item.end.speed > 0){
+							item.canvas.obj.css( {
+								'transition': `opacity ${item.start.speed}ms`
+							} );	
+						}
+					}
+
 				} else {
 					$document.trigger( 'action.trx_addons_bg_canvas_draw', [item] );
 				}

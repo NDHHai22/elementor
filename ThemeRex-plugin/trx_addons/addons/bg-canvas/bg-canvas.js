@@ -193,22 +193,19 @@
 			
 			var wst = trx_addons_window_scroll_top(),
 				wh  = trx_addons_window_height(),
-				// Tính khoảng cách từ start đến end
+				t  = item.start.top - wst,
+				dt = wh * item.start.shift / 100,
+				rt = 1 - Math.max( 0, Math.min( 1, ( t + dt ) / wh ) ),
+				b  = item.end.top + item.end.h - wst - wh,
+				db = wh * item.end.shift / 100,
+				rb = Math.max( 0, Math.min( 1, ( b + db ) / wh ) ),
 				startPoint = item.start.top + (wh * item.start.shift / 100),
 				endPoint = item.end.top + item.end.h - wh + (wh * item.end.shift / 100),
 				totalDistance = endPoint - startPoint,
 				currentDistance = wst - startPoint;
 			
-			// Tính progress từ 0 (start) đến 1 (end)
-			item.progress = totalDistance > 0 ? Math.max(0, Math.min(1, currentDistance / totalDistance)) : 0;
-			
-			// Tính distance cho color transition
-			var t  = item.start.top - wst,
-				dt = wh * item.start.shift / 100,
-				rt = 1 - Math.max( 0, Math.min( 1, ( t + dt ) / wh ) ),
-				b  = item.end.top + item.end.h - wst - wh,
-				db = wh * item.end.shift / 100,
-				rb = Math.max( 0, Math.min( 1, ( b + db ) / wh ) );
+			item.fade_progress = totalDistance > 0 ? Math.max(0, Math.min(1, currentDistance / totalDistance)) : 0;
+			item.progress = Math.min(rt, rb);
 			item.distance = rt == 1 && rb == 1 ? -t / ( -t - dt + b + db - wh ) : 0;
 			item.coords = item.end.top - wst + db < wh * 1.5 || rb < 1
 							? {
@@ -249,7 +246,20 @@
 						} );
 						jQuery( item.canvas.cnv ).show();
 					}
-					var t = item.progress * item.size;
+					
+					// Áp dụng speed để điều chỉnh tốc độ animation
+					var current_speed = item.coords.d == 'start' ? item.start.speed : item.end.speed;
+					var animated_progress = item.progress;
+					
+					if ( current_speed > 0 ) {
+						// Chuyển speed từ ms thành easing power
+						// speed càng lớn (5000ms) = phóng to càng chậm = easing power càng lớn
+						// speed càng nhỏ (500ms) = phóng to càng nhanh = easing power càng nhỏ
+						var easing_power = Math.max(0.5, Math.min(5, current_speed / 1000));
+						animated_progress = Math.pow(item.progress, 1 / easing_power);
+					}
+					
+					var t = animated_progress * item.size;
 					t = t < item.coords.r + 10 ? item.coords.r : t;
 					item.canvas.ctx.clearRect(0, 0, item.w, item.h);
 					item.canvas.ctx.beginPath();
@@ -258,41 +268,30 @@
 					item.canvas.ctx.closePath();
 					item.canvas.ctx.fill();
 				} else if ( effect == 'fade' ) {
+					// Xác định speed dựa trên vị trí: nửa trên dùng start.speed, nửa dưới dùng end.speed
+					var current_speed = item.fade_progress > 0.5 ? item.end.speed : item.start.speed;
 
-					console.log(item.start.speed);
 					if ( item.effect != effect || item.start.color != item.end.color ) {
 						item.canvas.obj.css( {
 							'background-color': color,
-							'transition': `opacity ${item.start.speed}ms ease`
+							'transition': current_speed > 0 ? `opacity ${current_speed}ms ease` : 'none'
 						} );
 					}
 					if ( item.effect != effect ) {
 						item.effect = effect;
 						jQuery( item.canvas.cnv ).hide();
 					}
-					if(item.progress > 0 && item.progress < 1){
+					if ( current_speed > 0 && item.last_speed !== current_speed ) {
 						item.canvas.obj.css( {
-							'opacity': 1
-						} );						
-					}
-					else{
-						item.canvas.obj.css( {
-							'opacity': 0
+							'transition': `opacity ${current_speed}ms ease`
 						} );
+						item.last_speed = current_speed;
 					}
-					if(item.progress > 0.5){
-						if(item.end.speed > 0){
-							item.canvas.obj.css( {
-								'transition': `opacity ${item.end.speed}ms`
-							} );	
-						}
-					}else{
-						if(item.end.speed > 0){
-							item.canvas.obj.css( {
-								'transition': `opacity ${item.start.speed}ms`
-							} );	
-						}
-					}
+					
+					// Điều chỉnh opacity
+					item.canvas.obj.css( {
+						'opacity': item.progress > 0 ? 1 : 0
+					} );
 
 				} else {
 					$document.trigger( 'action.trx_addons_bg_canvas_draw', [item] );

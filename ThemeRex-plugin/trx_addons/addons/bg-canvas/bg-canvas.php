@@ -123,30 +123,11 @@ if ( ! function_exists( 'trx_addons_elm_add_params_bg_canvas' ) ) {
 					'bg_canvas_type!' => 'none',
 				),
 			) );
-			$element->add_control( 'bg_canvas_size', array(
-				'label' => __( 'Min.size', 'trx_addons' ),
-				'type' => \Elementor\Controls_Manager::SLIDER,
-				'default' => array(
-					'size' => '',
-					'unit' => 'px'
-				),
-				'range' => array(
-					'px' => array(
-						'min' => 0,
-						'max' => 300
-					),
-				),
-				'size_units' => array( 'px' ),
-				'condition' => array(
-					'bg_canvas_type!' => 'none',
-					'bg_canvas_effect' => 'round',
-				),
-			) );
 			$element->add_control( 'bg_canvas_speed', array(
 				'label' => __( 'Speed (ms)', 'trx_addons' ),
 				'type' => \Elementor\Controls_Manager::SLIDER,
 				'default' => array(
-					'size' => '',
+					'size' => '500',
 					'unit' => 'ms'
 				),
 				'range' => array(
@@ -158,7 +139,7 @@ if ( ! function_exists( 'trx_addons_elm_add_params_bg_canvas' ) ) {
 				'size_units' => array( 'px' ),
 				'condition' => array(
 					'bg_canvas_type!' => 'none',
-					'bg_canvas_effect' => 'fade',
+					//'bg_canvas_effect' => 'fade',
 				),
 			) );
 
@@ -207,7 +188,7 @@ if ( !function_exists( 'trx_addons_elm_add_bg_canvas_data' ) ) {
 					'data-bg-canvas-effect' => $settings['bg_canvas_effect'] ?? 'round',
 					'data-bg-canvas-size'   => $settings['bg_canvas_size']['size'] ?? 0,
 					'data-bg-canvas-shift'  => $settings['bg_canvas_shift']['size'] ?? 0,
-					'data-bg-canvas-speed'   => $settings['bg_canvas_speed']['size'] ?? 0,
+					'data-bg-canvas-speed'   => $settings['bg_canvas_speed']['size'] ?? 500,
 					'data-bg-canvas-color'  => $settings['bg_canvas_color'] ?? ''
 				) );
 			}
